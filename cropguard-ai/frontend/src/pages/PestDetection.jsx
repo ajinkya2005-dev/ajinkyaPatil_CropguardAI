@@ -17,6 +17,9 @@ function PestDetection() {
         heading: "Pest Detection & Control",
         analyzing: "Analyzing pest threats...",
         none: "No pest threats detected for current crop condition.",
+        stableTitle: "🌿 Crop Health Looks Stable",
+        stableText:
+          "No immediate pest threats detected. Strengthen crop immunity using these AI suggestions.",
         risk: "Risk",
         reason: "Reason",
         control: "Recommended Control",
@@ -28,6 +31,8 @@ function PestDetection() {
         heading: "कीट पहचान और नियंत्रण",
         analyzing: "कीट खतरे का विश्लेषण...",
         none: "वर्तमान फसल स्थिति के लिए कोई कीट खतरा नहीं मिला।",
+        stableTitle: "🌿 फसल की स्थिति स्थिर है",
+        stableText: "AI सुझावों से फसल की ताकत बढ़ाएँ।",
         risk: "जोखिम",
         reason: "कारण",
         control: "अनुशंसित नियंत्रण",
@@ -39,6 +44,8 @@ function PestDetection() {
         heading: "किड ओळख व नियंत्रण",
         analyzing: "किड धोका विश्लेषण चालू...",
         none: "सध्याच्या पिकासाठी किड धोका नाही.",
+        stableTitle: "🌿 पीक स्थिती स्थिर आहे",
+        stableText: "AI सुचनांमुळे पीक अधिक मजबूत करा.",
         risk: "जोखीम",
         reason: "कारण",
         control: "शिफारस केलेले नियंत्रण",
@@ -50,12 +57,18 @@ function PestDetection() {
     return translations[language]?.[key] || key;
   };
 
+  /* ===============================
+     AMAZON LINK BUILDER (UNCHANGED)
+  ===============================*/
   const buildAmazonLink = (text) => {
     if (!text) return "#";
     const query = text.replace(/\s+/g, "+");
     return `https://www.amazon.in/s?k=${query}+for+plants`;
   };
 
+  /* ===============================
+     EXISTING SMART PRODUCTS ENGINE
+  ===============================*/
   const getRelatedProducts = (control) => {
     if (!control) return [];
 
@@ -93,6 +106,20 @@ function PestDetection() {
     ];
   };
 
+  /* ===============================
+     🔥 ELITE ADDITION — FALLBACK PRODUCTS
+  ===============================*/
+  const getFallbackProducts = () => {
+    return [
+      "Organic Bio Fertilizer Liquid",
+      "Seaweed Extract Growth Booster",
+      "Plant Immunity Booster Spray",
+      "Drip Irrigation Starter Kit",
+      "Soil Micro Nutrient Mix",
+      "Organic Compost Enhancer",
+    ];
+  };
+
   useEffect(() => {
     if (!stored) return;
 
@@ -125,10 +152,35 @@ function PestDetection() {
 
         {loading && <p style={styles.info}>{t("analyzing")}</p>}
 
+        {/* ===============================
+           🔥 ELITE EMPTY STATE CARD
+        ===============================*/}
         {!loading && pests.length === 0 && (
-          <p style={styles.info}>{t("none")}</p>
+          <div style={styles.emptyCard}>
+            <h3>{t("stableTitle")}</h3>
+            <p style={styles.info}>{t("stableText")}</p>
+
+            <div style={styles.productSection}>
+              <strong>{t("suggested")}</strong>
+
+              <div style={styles.productCarousel}>
+                {getFallbackProducts().map((prod, i) => (
+                  <a
+                    key={i}
+                    href={buildAmazonLink(prod)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.productChip}
+                  >
+                    🌱 {prod}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
 
+        {/* EXISTING PEST CARDS */}
         {pests.map((pest, index) => (
           <div key={index} style={styles.card}>
             <div style={styles.row}>
@@ -161,9 +213,7 @@ function PestDetection() {
             </a>
 
             <div style={styles.productSection}>
-              <strong style={{ color: "#142C52" }}>
-                {t("suggested")}
-              </strong>
+              <strong>{t("suggested")}</strong>
 
               <div style={styles.productCarousel}>
                 {getRelatedProducts(pest.control).map((prod, i) => (
@@ -190,15 +240,26 @@ function PestDetection() {
   );
 }
 
+/* ===============================
+   🎨 ELITE UI V2 STYLES
+===============================*/
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
   header: { backgroundColor: "#142C52", padding: "14px 32px" },
   brand: { display: "flex", alignItems: "center", gap: "12px" },
   logo: { height: "36px", backgroundColor: "#ffffff", padding: "6px", borderRadius: "8px" },
   brandText: { color: "#1B9AAA", margin: 0 },
-  container: { padding: "60px 80px" },
+
+  container: {
+    padding: "40px 20px",
+    maxWidth: "1000px",
+    margin: "0 auto",
+  },
+
   heading: { color: "#142C52", marginBottom: "30px" },
   info: { color: "#16808D", fontSize: "16px" },
+
+  /* EXISTING CARD */
   card: {
     backgroundColor: "#ffffff",
     padding: "24px",
@@ -207,12 +268,26 @@ const styles = {
     boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
     color: "#142C52",
   },
+
+  /* 🔥 NEW EMPTY CARD */
+  emptyCard: {
+    backgroundColor: "#ffffff",
+    padding: "26px",
+    borderRadius: "18px",
+    marginBottom: "20px",
+    boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
+    color: "#142C52",
+  },
+
   row: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "10px",
+    flexWrap: "wrap",
+    gap: "10px",
   },
+
   badge: {
     color: "#ffffff",
     padding: "6px 14px",
@@ -220,6 +295,7 @@ const styles = {
     fontSize: "13px",
     fontWeight: "600",
   },
+
   link: {
     display: "inline-block",
     marginTop: "10px",
@@ -227,7 +303,9 @@ const styles = {
     fontWeight: "600",
     textDecoration: "none",
   },
+
   productSection: { marginTop: "16px" },
+
   productCarousel: {
     display: "flex",
     gap: "10px",
@@ -235,6 +313,7 @@ const styles = {
     marginTop: "10px",
     paddingBottom: "6px",
   },
+
   productChip: {
     backgroundColor: "#E6F6F8",
     padding: "8px 14px",
@@ -246,6 +325,7 @@ const styles = {
     whiteSpace: "nowrap",
     flexShrink: 0,
   },
+
   button: {
     marginTop: "30px",
     padding: "14px 24px",
@@ -255,6 +335,8 @@ const styles = {
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "600",
+    width: "100%",
+    maxWidth: "260px",
   },
 };
 
