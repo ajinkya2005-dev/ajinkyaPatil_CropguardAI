@@ -12,6 +12,56 @@ function ImageUpload() {
   const [cameraOn, setCameraOn] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        title: "Image-Based Detection",
+        upload: "Upload Crop Image",
+        camera: "Use Camera",
+        capture: "Capture Image",
+        analyzing: "Analyzing image…",
+        success: "Image processed successfully. Redirecting…",
+        steps: "How to Upload Proper Crop Image",
+        step1: "📸 Capture clear leaf or crop area",
+        step2: "🌞 Use natural lighting",
+        step3: "🔍 Avoid blurry or far shots",
+        multi: "You can select multiple images",
+      },
+      hi: {
+        title: "छवि आधारित पहचान",
+        upload: "फसल छवि अपलोड करें",
+        camera: "कैमरा उपयोग करें",
+        capture: "छवि कैप्चर करें",
+        analyzing: "छवि का विश्लेषण हो रहा है…",
+        success: "छवि सफलतापूर्वक प्रोसेस हुई।",
+        steps: "सही फसल छवि कैसे अपलोड करें",
+        step1: "📸 साफ पत्ती की फोटो लें",
+        step2: "🌞 प्राकृतिक रोशनी उपयोग करें",
+        step3: "🔍 धुंधली फोटो से बचें",
+        multi: "एक से अधिक छवियां चुन सकते हैं",
+      },
+      mr: {
+        title: "प्रतिमा आधारित शोध",
+        upload: "पीक फोटो अपलोड करा",
+        camera: "कॅमेरा वापरा",
+        capture: "फोटो कॅप्चर करा",
+        analyzing: "प्रतिमा विश्लेषण सुरू आहे…",
+        success: "प्रतिमा प्रोसेस झाली.",
+        steps: "योग्य पीक फोटो कसा अपलोड करावा",
+        step1: "📸 स्पष्ट पानाचा फोटो घ्या",
+        step2: "🌞 नैसर्गिक प्रकाश वापरा",
+        step3: "🔍 ब्लर फोटो टाळा",
+        multi: "अनेक फोटो निवडू शकता",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
+  /* ================================
+     CAMERA
+  =================================*/
   const startCamera = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -42,12 +92,21 @@ function ImageUpload() {
     }, "image/jpeg");
   };
 
+  /* ================================
+     MULTI IMAGE UPLOAD
+  =================================*/
   const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    sendToBackend(file);
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    for (let file of files) {
+      await sendToBackend(file);
+    }
   };
 
+  /* ================================
+     BACKEND CALL
+  =================================*/
   const sendToBackend = async (file) => {
     try {
       setLoading(true);
@@ -97,15 +156,25 @@ function ImageUpload() {
 
       <div style={styles.center}>
         <div style={styles.card}>
-          <h2 style={styles.heading}>Image-Based Detection</h2>
+          <h2 style={styles.heading}>{t("title")}</h2>
+
+          {/* ⭐ STEP GUIDE CARD */}
+          <div style={styles.guide}>
+            <strong>{t("steps")}</strong>
+            <p>{t("step1")}</p>
+            <p>{t("step2")}</p>
+            <p>{t("step3")}</p>
+          </div>
 
           {!cameraOn && (
             <>
               <label style={styles.uploadBox}>
-                Upload Crop Image
+                {t("upload")}
+                <p style={styles.multi}>{t("multi")}</p>
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleUpload}
                   style={{ display: "none" }}
                   disabled={loading}
@@ -113,107 +182,105 @@ function ImageUpload() {
               </label>
 
               <button style={styles.cameraBtn} onClick={startCamera}>
-                Use Camera
+                {t("camera")}
               </button>
             </>
           )}
 
           {cameraOn && (
             <>
-              <video
-                ref={videoRef}
-                autoPlay
-                style={styles.video}
-              />
+              <video ref={videoRef} autoPlay style={styles.video} />
               <button style={styles.captureBtn} onClick={captureImage}>
-                Capture Image
+                {t("capture")}
               </button>
             </>
           )}
 
           <canvas ref={canvasRef} style={{ display: "none" }} />
 
-          {loading && (
-            <div style={styles.info}>Analyzing image…</div>
-          )}
-
-          {success && (
-            <div style={styles.success}>
-              Image processed successfully. Redirecting…
-            </div>
-          )}
+          {loading && <div style={styles.info}>{t("analyzing")}</div>}
+          {success && <div style={styles.success}>{t("success")}</div>}
         </div>
       </div>
     </div>
   );
 }
 
+/* ================================
+   ⭐ PREMIUM MOBILE STYLES
+=================================*/
 const styles = {
-  page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
-  header: { backgroundColor: "#142C52", padding: "14px 32px" },
-  brand: { display: "flex", alignItems: "center", gap: "12px" },
-  logo: { height: "36px", backgroundColor: "#fff", padding: "6px", borderRadius: "8px" },
-  brandText: { color: "#1B9AAA", margin: 0 },
+  page:{minHeight:"100vh",backgroundColor:"#f4f6f8"},
+  header:{backgroundColor:"#142C52",padding:"14px 20px"},
+  brand:{display:"flex",alignItems:"center",gap:"12px"},
+  logo:{height:"36px",backgroundColor:"#fff",padding:"6px",borderRadius:"8px"},
+  brandText:{color:"#1B9AAA",margin:0},
 
-  center: { display: "flex", justifyContent: "center", paddingTop: "80px" },
-  card: {
-    backgroundColor: "#fff",
-    padding: "40px",
-    borderRadius: "18px",
-    width: "420px",
-    textAlign: "center",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
+  center:{display:"flex",justifyContent:"center",padding:"40px 16px"},
+  card:{
+    backgroundColor:"#fff",
+    padding:"28px",
+    borderRadius:"18px",
+    width:"100%",
+    maxWidth:"420px",
+    textAlign:"center",
+    boxShadow:"0 20px 40px rgba(0,0,0,0.12)",
   },
 
-  heading: { marginBottom: "20px" },
+  heading:{marginBottom:"18px",color:"#142C52"},
 
-  uploadBox: {
-    display: "block",
-    padding: "16px",
-    borderRadius: "12px",
-    border: "2px dashed #1B9AAA",
-    color: "#16808D",
-    cursor: "pointer",
-    marginBottom: "16px",
+  guide:{
+    backgroundColor:"#E6F6F8",
+    padding:"14px",
+    borderRadius:"12px",
+    marginBottom:"18px",
+    textAlign:"left",
+    color:"#16808D",
+    fontSize:"14px",
   },
 
-  cameraBtn: {
-    padding: "12px",
-    backgroundColor: "#142C52",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    width: "100%",
+  uploadBox:{
+    display:"block",
+    padding:"16px",
+    borderRadius:"14px",
+    border:"2px dashed #1B9AAA",
+    color:"#16808D",
+    cursor:"pointer",
+    marginBottom:"14px",
   },
 
-  video: {
-    width: "100%",
-    borderRadius: "12px",
-    marginBottom: "12px",
+  multi:{fontSize:"12px",marginTop:"6px"},
+
+  cameraBtn:{
+    padding:"12px",
+    backgroundColor:"#142C52",
+    color:"#fff",
+    border:"none",
+    borderRadius:"12px",
+    width:"100%",
+    fontWeight:"600"
   },
 
-  captureBtn: {
-    padding: "12px",
-    backgroundColor: "#1B9AAA",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    width: "100%",
+  video:{width:"100%",borderRadius:"12px",marginBottom:"12px"},
+
+  captureBtn:{
+    padding:"12px",
+    backgroundColor:"#1B9AAA",
+    color:"#fff",
+    border:"none",
+    borderRadius:"12px",
+    width:"100%",
+    fontWeight:"600"
   },
 
-  info: {
-    marginTop: "16px",
-    color: "#16808D",
-    fontWeight: "600",
-  },
-
-  success: {
-    marginTop: "16px",
-    backgroundColor: "#E6F6F8",
-    color: "#16808D",
-    padding: "12px",
-    borderRadius: "10px",
-    fontWeight: "600",
+  info:{marginTop:"16px",color:"#16808D",fontWeight:"600"},
+  success:{
+    marginTop:"16px",
+    backgroundColor:"#E6F6F8",
+    color:"#16808D",
+    padding:"12px",
+    borderRadius:"10px",
+    fontWeight:"600",
   },
 };
 

@@ -9,6 +9,90 @@ function PestDetection() {
   const [pests, setPests] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        heading: "Pest Detection & Control",
+        analyzing: "Analyzing pest threats...",
+        none: "No pest threats detected for current crop condition.",
+        risk: "Risk",
+        reason: "Reason",
+        control: "Recommended Control",
+        buy: "Buy Control Product",
+        suggested: "AI Suggested Products",
+        back: "Back to Home",
+      },
+      hi: {
+        heading: "कीट पहचान और नियंत्रण",
+        analyzing: "कीट खतरे का विश्लेषण...",
+        none: "वर्तमान फसल स्थिति के लिए कोई कीट खतरा नहीं मिला।",
+        risk: "जोखिम",
+        reason: "कारण",
+        control: "अनुशंसित नियंत्रण",
+        buy: "उत्पाद खरीदें",
+        suggested: "AI सुझाए गए उत्पाद",
+        back: "होम पर वापस जाएं",
+      },
+      mr: {
+        heading: "किड ओळख व नियंत्रण",
+        analyzing: "किड धोका विश्लेषण चालू...",
+        none: "सध्याच्या पिकासाठी किड धोका नाही.",
+        risk: "जोखीम",
+        reason: "कारण",
+        control: "शिफारस केलेले नियंत्रण",
+        buy: "उत्पादन खरेदी करा",
+        suggested: "AI सुचवलेली उत्पादने",
+        back: "होम वर जा",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
+  const buildAmazonLink = (text) => {
+    if (!text) return "#";
+    const query = text.replace(/\s+/g, "+");
+    return `https://www.amazon.in/s?k=${query}+for+plants`;
+  };
+
+  const getRelatedProducts = (control) => {
+    if (!control) return [];
+
+    const c = control.toLowerCase();
+
+    if (c.includes("neem"))
+      return [
+        "Neem Oil Spray Organic",
+        "Cold Pressed Neem Oil",
+        "Aphid Control Neem Concentrate",
+        "Neem Extract Plant Booster",
+      ];
+
+    if (c.includes("fungicide"))
+      return [
+        "Copper Fungicide Spray",
+        "Organic Plant Fungicide",
+        "Broad Spectrum Fungicide",
+        "Bio Fungicide Solution",
+      ];
+
+    if (c.includes("pesticide"))
+      return [
+        "Bio Pesticide Spray",
+        "Organic Pest Control Kit",
+        "Plant Protection Insecticide",
+        "Eco Friendly Pest Shield",
+      ];
+
+    return [
+      "Plant Protection Spray",
+      "Organic Crop Booster",
+      "Multi Pest Control Solution",
+      "Natural Plant Defense Kit",
+    ];
+  };
+
   useEffect(() => {
     if (!stored) return;
 
@@ -37,14 +121,12 @@ function PestDetection() {
       </header>
 
       <div style={styles.container}>
-        <h2 style={styles.heading}>Pest Detection & Control</h2>
+        <h2 style={styles.heading}>{t("heading")}</h2>
 
-        {loading && <p style={styles.info}>Analyzing pest threats...</p>}
+        {loading && <p style={styles.info}>{t("analyzing")}</p>}
 
         {!loading && pests.length === 0 && (
-          <p style={styles.info}>
-            No pest threats detected for current crop condition.
-          </p>
+          <p style={styles.info}>{t("none")}</p>
         )}
 
         {pests.map((pest, index) => (
@@ -62,26 +144,46 @@ function PestDetection() {
                       : "#16A34A",
                 }}
               >
-                {pest.risk} Risk
+                {pest.risk} {t("risk")}
               </span>
             </div>
 
-            <p><strong>Reason:</strong> {pest.reason}</p>
-            <p><strong>Recommended Control:</strong> {pest.control}</p>
+            <p><strong>{t("reason")}:</strong> {pest.reason}</p>
+            <p><strong>{t("control")}:</strong> {pest.control}</p>
 
             <a
-              href={pest.buy_link}
+              href={pest.buy_link || buildAmazonLink(pest.control)}
               target="_blank"
               rel="noopener noreferrer"
               style={styles.link}
             >
-              Buy Control Product
+              {t("buy")}
             </a>
+
+            <div style={styles.productSection}>
+              <strong style={{ color: "#142C52" }}>
+                {t("suggested")}
+              </strong>
+
+              <div style={styles.productCarousel}>
+                {getRelatedProducts(pest.control).map((prod, i) => (
+                  <a
+                    key={i}
+                    href={buildAmazonLink(prod)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.productChip}
+                  >
+                    🛒 {prod}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
 
         <button style={styles.button} onClick={() => navigate("/home")}>
-          Back to Home
+          {t("back")}
         </button>
       </div>
     </div>
@@ -89,40 +191,14 @@ function PestDetection() {
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: "#f4f6f8",
-  },
-  header: {
-    backgroundColor: "#142C52",
-    padding: "14px 32px",
-  },
-  brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  logo: {
-    height: "36px",
-    backgroundColor: "#ffffff",
-    padding: "6px",
-    borderRadius: "8px",
-  },
-  brandText: {
-    color: "#1B9AAA",
-    margin: 0,
-  },
-  container: {
-    padding: "60px 80px",
-  },
-  heading: {
-    color: "#142C52",
-    marginBottom: "30px",
-  },
-  info: {
-    color: "#16808D",
-    fontSize: "16px",
-  },
+  page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
+  header: { backgroundColor: "#142C52", padding: "14px 32px" },
+  brand: { display: "flex", alignItems: "center", gap: "12px" },
+  logo: { height: "36px", backgroundColor: "#ffffff", padding: "6px", borderRadius: "8px" },
+  brandText: { color: "#1B9AAA", margin: 0 },
+  container: { padding: "60px 80px" },
+  heading: { color: "#142C52", marginBottom: "30px" },
+  info: { color: "#16808D", fontSize: "16px" },
   card: {
     backgroundColor: "#ffffff",
     padding: "24px",
@@ -150,6 +226,25 @@ const styles = {
     color: "#1B9AAA",
     fontWeight: "600",
     textDecoration: "none",
+  },
+  productSection: { marginTop: "16px" },
+  productCarousel: {
+    display: "flex",
+    gap: "10px",
+    overflowX: "auto",
+    marginTop: "10px",
+    paddingBottom: "6px",
+  },
+  productChip: {
+    backgroundColor: "#E6F6F8",
+    padding: "8px 14px",
+    borderRadius: "20px",
+    textDecoration: "none",
+    color: "#16808D",
+    fontSize: "13px",
+    fontWeight: "600",
+    whiteSpace: "nowrap",
+    flexShrink: 0,
   },
   button: {
     marginTop: "30px",

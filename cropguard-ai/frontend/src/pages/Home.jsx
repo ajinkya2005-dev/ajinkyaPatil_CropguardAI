@@ -7,6 +7,53 @@ function Home() {
   const farmerProfile = JSON.parse(localStorage.getItem("activeFarmer"));
   const [showProfile, setShowProfile] = useState(false);
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        history: "History",
+        calendar: "Crop Calendar",
+        dashboard: "Dashboard",
+        contact: "Contact Us",
+        logout: "Logout",
+        title: "Smart Crop Disease Detection",
+        subtitle:
+          "Upload crop images and receive AI-powered disease detection, personalized treatment plans, and explainable insights.",
+        upload: "Upload Crop Image",
+        analysis: "Disease Analysis",
+        pests: "Pest Detection",
+      },
+      hi: {
+        history: "इतिहास",
+        calendar: "फसल कैलेंडर",
+        dashboard: "डैशबोर्ड",
+        contact: "संपर्क करें",
+        logout: "लॉगआउट",
+        title: "स्मार्ट फसल रोग पहचान",
+        subtitle:
+          "फसल की तस्वीर अपलोड करें और एआई आधारित रोग पहचान और उपचार सुझाव प्राप्त करें।",
+        upload: "फसल छवि अपलोड करें",
+        analysis: "रोग विश्लेषण",
+        pests: "कीट पहचान",
+      },
+      mr: {
+        history: "इतिहास",
+        calendar: "पीक कॅलेंडर",
+        dashboard: "डॅशबोर्ड",
+        contact: "संपर्क करा",
+        logout: "लॉगआउट",
+        title: "स्मार्ट पीक रोग शोध",
+        subtitle:
+          "पीक फोटो अपलोड करा आणि एआय आधारित रोग शोध व उपचार सल्ला मिळवा.",
+        upload: "पीक फोटो अपलोड",
+        analysis: "रोग विश्लेषण",
+        pests: "कीड ओळख",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
   return (
     <div style={styles.app}>
       <header style={styles.header}>
@@ -17,17 +64,17 @@ function Home() {
 
         <nav style={{ display: "flex", alignItems: "center", gap: "24px" }}>
           <ul style={styles.navList}>
-            <li style={styles.navItem} onClick={() => navigate("/home")}>
-              Home
-            </li>
             <li style={styles.navItem} onClick={() => navigate("/history")}>
-              History
+              {t("history")}
             </li>
             <li style={styles.navItem} onClick={() => navigate("/calendar")}>
-              Crop Calendar
+              {t("calendar")}
             </li>
             <li style={styles.navItem} onClick={() => navigate("/dashboard")}>
-              Dashboard
+              {t("dashboard")}
+            </li>
+            <li style={styles.navItem} onClick={() => navigate("/contact")}>
+              {t("contact")}
             </li>
           </ul>
 
@@ -45,7 +92,7 @@ function Home() {
                   fontWeight: "600",
                 }}
               >
-                👤 {farmerProfile.fullName}
+                {farmerProfile.fullName}
               </button>
 
               {showProfile && (
@@ -88,7 +135,7 @@ function Home() {
                       fontWeight: "600",
                     }}
                   >
-                    Logout
+                    {t("logout")}
                   </button>
                 </div>
               )}
@@ -99,32 +146,29 @@ function Home() {
 
       <main style={styles.main}>
         <div style={styles.card}>
-          <h1 style={styles.heading}>Smart Crop Disease Detection</h1>
-          <p style={styles.subText}>
-            Upload crop images and receive AI-powered disease detection,
-            personalized treatment plans, and explainable insights.
-          </p>
+          <h1 style={styles.heading}>{t("title")}</h1>
+          <p style={styles.subText}>{t("subtitle")}</p>
 
           <div style={styles.actions}>
             <button
               style={styles.primaryBtn}
               onClick={() => navigate("/upload")}
             >
-              Upload Crop Image
+              {t("upload")}
             </button>
 
             <button
               style={styles.secondaryBtn}
               onClick={() => navigate("/analysis")}
             >
-              Disease Analysis
+              {t("analysis")}
             </button>
 
             <button
               style={styles.tertiaryBtn}
               onClick={() => navigate("/pests")}
             >
-              Pest Detection
+              {t("pests")}
             </button>
           </div>
         </div>

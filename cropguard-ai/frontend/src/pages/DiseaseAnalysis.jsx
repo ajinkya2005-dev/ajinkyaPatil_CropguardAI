@@ -2,9 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
-/* ===============================
-   🔐 SAFE PARSE HELPERS (ADDITION)
-=============================== */
 const safeParse = (key, fallback) => {
   try {
     const data = JSON.parse(localStorage.getItem(key));
@@ -17,6 +14,95 @@ const safeParse = (key, fallback) => {
 function DiseaseAnalysis() {
   const navigate = useNavigate();
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        noAnalysisTitle: "No Analysis Available",
+        noAnalysisText: "Please upload a crop image to view AI analysis.",
+        backHome: "Back to Home",
+        title: "Disease Analysis",
+        overlayTitle: "AI Vision Overlay",
+        hideOverlay: "Hide AI Overlay",
+        showOverlay: "Show AI Overlay",
+        risk: "Risk Level",
+        severity: "Severity",
+        confidence: "AI Confidence",
+        farmContext: "Farm Context Used by AI",
+        location: "Location",
+        crop: "Crop",
+        stage: "Growth Stage",
+        age: "Crop Age",
+        cultivation: "Cultivation",
+        disease: "Disease",
+        priority: "Action Priority",
+        learning: "AI Learning Insight",
+        whyText: "Why was this disease detected?",
+        planner: "Smart Treatment & Action Planner",
+        explainTitle: "Explainable AI – Decision Reasoning",
+        keyFactors: "Key Risk Factors",
+        decisionExplain: "Decision Explanation",
+        close: "Close",
+      },
+      hi: {
+        noAnalysisTitle: "कोई विश्लेषण उपलब्ध नहीं",
+        noAnalysisText: "AI विश्लेषण देखने के लिए कृपया फसल छवि अपलोड करें।",
+        backHome: "होम पर वापस जाएं",
+        title: "रोग विश्लेषण",
+        overlayTitle: "AI विज़न ओवरले",
+        hideOverlay: "AI ओवरले छुपाएँ",
+        showOverlay: "AI ओवरले दिखाएँ",
+        risk: "जोखिम स्तर",
+        severity: "गंभीरता",
+        confidence: "AI विश्वास",
+        farmContext: "AI द्वारा उपयोग किया गया फार्म संदर्भ",
+        location: "स्थान",
+        crop: "फसल",
+        stage: "विकास चरण",
+        age: "फसल आयु",
+        cultivation: "खेती प्रकार",
+        disease: "रोग",
+        priority: "कार्य प्राथमिकता",
+        learning: "AI लर्निंग इनसाइट",
+        whyText: "यह रोग क्यों पाया गया?",
+        planner: "स्मार्ट उपचार योजना",
+        explainTitle: "Explainable AI – निर्णय कारण",
+        keyFactors: "मुख्य जोखिम कारक",
+        decisionExplain: "निर्णय व्याख्या",
+        close: "बंद करें",
+      },
+      mr: {
+        noAnalysisTitle: "विश्लेषण उपलब्ध नाही",
+        noAnalysisText: "AI विश्लेषण पाहण्यासाठी कृपया पीक फोटो अपलोड करा.",
+        backHome: "होम वर जा",
+        title: "रोग विश्लेषण",
+        overlayTitle: "AI व्हिजन ओव्हरले",
+        hideOverlay: "AI ओव्हरले लपवा",
+        showOverlay: "AI ओव्हरले दाखवा",
+        risk: "जोखीम स्तर",
+        severity: "तीव्रता",
+        confidence: "AI विश्वास",
+        farmContext: "AI ने वापरलेला शेत संदर्भ",
+        location: "स्थान",
+        crop: "पीक",
+        stage: "वाढ अवस्था",
+        age: "पीक वय",
+        cultivation: "शेती प्रकार",
+        disease: "रोग",
+        priority: "कार्य प्राधान्य",
+        learning: "AI लर्निंग इनसाइट",
+        whyText: "हा रोग का ओळखला गेला?",
+        planner: "स्मार्ट उपचार योजना",
+        explainTitle: "Explainable AI – निर्णय कारण",
+        keyFactors: "मुख्य जोखीम घटक",
+        decisionExplain: "निर्णय स्पष्टीकरण",
+        close: "बंद करा",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
   const stored = safeParse("lastAnalysis", null);
   const history = safeParse("analysisHistory", []);
   const farmerProfile = safeParse("farmerProfile", null);
@@ -27,14 +113,11 @@ function DiseaseAnalysis() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [opacity, setOpacity] = useState(0.4);
 
-  /* ===============================
-     🔐 HARD GUARD (ADDITION)
-  =============================== */
   if (!stored || !stored.analysis) {
     return (
       <div style={{ padding: "80px", textAlign: "center", color: "#142C52" }}>
-        <h2>No Analysis Available</h2>
-        <p>Please upload a crop image to view AI analysis.</p>
+        <h2>{t("noAnalysisTitle")}</h2>
+        <p>{t("noAnalysisText")}</p>
         <button
           style={{
             marginTop: "20px",
@@ -47,7 +130,7 @@ function DiseaseAnalysis() {
           }}
           onClick={() => navigate("/home")}
         >
-          Back to Home
+          {t("backHome")}
         </button>
       </div>
     );
@@ -122,18 +205,18 @@ function DiseaseAnalysis() {
 
       <div style={styles.center}>
         <div style={styles.card}>
-          <h2 style={styles.heading}>Disease Analysis</h2>
+          <h2 style={styles.heading}>{t("title")}</h2>
 
           {heatmap && (
             <div style={styles.heatmapBox}>
-              <h4 style={styles.heatmapTitle}>AI Vision Overlay</h4>
+              <h4 style={styles.heatmapTitle}>{t("overlayTitle")}</h4>
 
               <div style={styles.toggleRow}>
                 <button
                   style={styles.toggleBtn}
                   onClick={() => setShowHeatmap(!showHeatmap)}
                 >
-                  {showHeatmap ? "Hide AI Overlay" : "Show AI Overlay"}
+                  {showHeatmap ? t("hideOverlay") : t("showOverlay")}
                 </button>
 
                 <input
@@ -160,16 +243,16 @@ function DiseaseAnalysis() {
 
           <div style={styles.badgeRow}>
             <span style={{ ...styles.riskBadge, backgroundColor: riskColor }}>
-              Risk Level: {risk_level}
+              {t("risk")}: {risk_level}
             </span>
             <span style={{ ...styles.severityText, color: severityColor }}>
-              Severity: {severity}
+              {t("severity")}: {severity}
             </span>
           </div>
 
           <div style={styles.confidenceWrapper}>
             <div style={styles.confidenceLabel}>
-              AI Confidence: {Math.round(confidence * 100)}%
+              {t("confidence")}: {Math.round(confidence * 100)}%
             </div>
             <div style={styles.confidenceTrack}>
               <div
@@ -184,18 +267,18 @@ function DiseaseAnalysis() {
 
           {farmerProfile && (
             <div style={styles.contextBox}>
-              <h4>Farm Context Used by AI</h4>
-              <p><strong>Location:</strong> {farmerProfile.location}</p>
-              <p><strong>Crop:</strong> {farmerProfile.cropType}</p>
-              <p><strong>Growth Stage:</strong> {farmerProfile.growthStage}</p>
-              <p><strong>Crop Age:</strong> {farmerProfile.cropAgeDays} days</p>
-              <p><strong>Cultivation:</strong> {farmerProfile.cultivationType}</p>
+              <h4>{t("farmContext")}</h4>
+              <p><strong>{t("location")}:</strong> {farmerProfile.location}</p>
+              <p><strong>{t("crop")}:</strong> {farmerProfile.cropType}</p>
+              <p><strong>{t("stage")}:</strong> {farmerProfile.growthStage}</p>
+              <p><strong>{t("age")}:</strong> {farmerProfile.cropAgeDays} days</p>
+              <p><strong>{t("cultivation")}:</strong> {farmerProfile.cultivationType}</p>
             </div>
           )}
 
           <div style={styles.details}>
-            <p><strong>Disease:</strong> {disease}</p>
-            <p><strong>Action Priority:</strong> {action_priority}</p>
+            <p><strong>{t("disease")}:</strong> {disease}</p>
+            <p><strong>{t("priority")}:</strong> {action_priority}</p>
           </div>
 
           <div style={styles.recommendation}>{recommendation}</div>
@@ -206,12 +289,12 @@ function DiseaseAnalysis() {
               borderLeft: `6px solid ${learningColor}`,
             }}
           >
-            <strong>AI Learning Insight</strong>
+            <strong>{t("learning")}</strong>
             <p style={{ marginTop: "6px" }}>{learningMessage}</p>
           </div>
 
           <div style={styles.whyRow}>
-            <span>Why was this disease detected?</span>
+            <span>{t("whyText")}</span>
             <button
               style={styles.whyButton}
               onClick={() => setShowExplain(true)}
@@ -225,7 +308,7 @@ function DiseaseAnalysis() {
               style={styles.actionHeading}
               onClick={() => setShowActions(!showActions)}
             >
-              Smart Treatment & Action Planner
+              {t("planner")}
             </h3>
 
             {showActions && (
@@ -238,7 +321,7 @@ function DiseaseAnalysis() {
           </div>
 
           <button style={styles.button} onClick={() => navigate("/home")}>
-            Back to Home
+            {t("backHome")}
           </button>
         </div>
       </div>
@@ -246,9 +329,9 @@ function DiseaseAnalysis() {
       {showExplain && (
         <div style={styles.overlay}>
           <div style={styles.explainCard}>
-            <h3>Explainable AI – Decision Reasoning</h3>
+            <h3>{t("explainTitle")}</h3>
 
-            <h4>Key Risk Factors</h4>
+            <h4>{t("keyFactors")}</h4>
             <ul>
               {Array.isArray(key_risk_factors) && key_risk_factors.length > 0
                 ? key_risk_factors.map((item, i) => (
@@ -257,7 +340,7 @@ function DiseaseAnalysis() {
                 : <li>Environmental and visual stress indicators detected</li>}
             </ul>
 
-            <h4>Decision Explanation</h4>
+            <h4>{t("decisionExplain")}</h4>
             <ul>
               {Array.isArray(decision_explanation) && decision_explanation.length > 0
                 ? decision_explanation.map((item, i) => (
@@ -270,7 +353,7 @@ function DiseaseAnalysis() {
               style={styles.closeButton}
               onClick={() => setShowExplain(false)}
             >
-              Close
+              {t("close")}
             </button>
           </div>
         </div>

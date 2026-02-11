@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import PestDetection from "./pages/PestDetection";
 import LocalAgroStores from "./pages/LocalAgroStores";
 import CropCalendar from "./pages/CropCalendar";
+import ContactUs from "./pages/ContactUs";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/stores" element={<LocalAgroStores />} />
       <Route path="/calendar" element={<CropCalendar />} />
       <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/contact" element={<ContactUs />} />
     </Routes>
   );
 }

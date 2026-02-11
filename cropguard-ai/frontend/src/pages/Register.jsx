@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { useLanguage } from "../context/LanguageContext";
 
 const cropOptions = {
   Cereals: ["Wheat", "Rice", "Maize", "Barley"],
@@ -14,6 +15,7 @@ const cropOptions = {
 
 function Register() {
   const navigate = useNavigate();
+  const { language, setLanguage } = useLanguage();
 
   const [mode, setMode] = useState("register");
   const [loginName, setLoginName] = useState("");
@@ -56,7 +58,6 @@ function Register() {
     return { cropAgeDays: diffDays, growthStage: stage };
   };
 
-  /* ================= REGISTER ================= */
   const handleRegister = () => {
     if (!isComplete) return;
 
@@ -80,7 +81,6 @@ function Register() {
     navigate("/home");
   };
 
-  /* ================= ALREADY REGISTERED ================= */
   const handleLogin = () => {
     const farmers = JSON.parse(localStorage.getItem("farmers")) || [];
 
@@ -110,7 +110,20 @@ function Register() {
 
       <div style={styles.center}>
         <div style={styles.card}>
-          <h2 style={styles.heading}>Farmer Access</h2>
+          <h2 style={styles.heading}>Farmer Registeration</h2>
+
+          <select
+            value={language}
+            onChange={(e) => {
+              setLanguage(e.target.value);
+              localStorage.setItem("appLanguage", e.target.value);
+            }}
+            style={styles.input}
+          >
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="mr">Marathi</option>
+          </select>
 
           <div style={styles.switchRow}>
             <button

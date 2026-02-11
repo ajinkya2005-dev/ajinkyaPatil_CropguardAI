@@ -6,6 +6,59 @@ import logo from "../assets/logo.png";
 function History() {
   const [history, setHistory] = useState([]);
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        title: "History & Reports",
+        empty: "No analysis history available.",
+        reportTitle: "Crop Disease Report",
+        risk: "Risk",
+        severity: "Severity",
+        date: "Date",
+        disease: "Disease",
+        confidence: "Confidence",
+        treatmentOutcome: "Treatment Outcome",
+        improved: "Improved",
+        same: "Same",
+        worsened: "Worsened",
+        export: "Export PDF",
+      },
+      hi: {
+        title: "इतिहास और रिपोर्ट",
+        empty: "कोई विश्लेषण इतिहास उपलब्ध नहीं है।",
+        reportTitle: "फसल रोग रिपोर्ट",
+        risk: "जोखिम",
+        severity: "गंभीरता",
+        date: "तारीख",
+        disease: "रोग",
+        confidence: "विश्वास",
+        treatmentOutcome: "उपचार परिणाम",
+        improved: "सुधरा",
+        same: "कोई बदलाव नहीं",
+        worsened: "खराब हुआ",
+        export: "PDF निर्यात करें",
+      },
+      mr: {
+        title: "इतिहास व अहवाल",
+        empty: "कोणताही विश्लेषण इतिहास उपलब्ध नाही.",
+        reportTitle: "पीक रोग अहवाल",
+        risk: "जोखीम",
+        severity: "तीव्रता",
+        date: "दिनांक",
+        disease: "रोग",
+        confidence: "विश्वास",
+        treatmentOutcome: "उपचार परिणाम",
+        improved: "सुधारले",
+        same: "बदल नाही",
+        worsened: "वाईट झाले",
+        export: "PDF एक्सपोर्ट करा",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
   useEffect(() => {
     const stored =
       JSON.parse(localStorage.getItem("analysisHistory")) || [];
@@ -19,7 +72,6 @@ function History() {
       ? "#F59E0B"
       : "#16A34A";
 
-  /* 🔹 ADDITION: Save treatment outcome */
   const saveOutcome = (id, outcome) => {
     const updated = history.map((item) =>
       item.id === id
@@ -75,10 +127,10 @@ function History() {
       </header>
 
       <div style={styles.container}>
-        <h2 style={styles.heading}>History & Reports</h2>
+        <h2 style={styles.heading}>{t("title")}</h2>
 
         {history.length === 0 && (
-          <p style={styles.empty}>No analysis history available.</p>
+          <p style={styles.empty}>{t("empty")}</p>
         )}
 
         {history.map((item) => {
@@ -87,7 +139,7 @@ function History() {
           return (
             <div key={item.id} style={styles.card}>
               <div id={`report-${item.id}`} style={styles.report}>
-                <h3 style={styles.cardTitle}>Crop Disease Report</h3>
+                <h3 style={styles.cardTitle}>{t("reportTitle")}</h3>
 
                 <div style={styles.indicatorRow}>
                   <span
@@ -96,7 +148,7 @@ function History() {
                       backgroundColor: color,
                     }}
                   >
-                    Risk: {item.analysis.risk_level}
+                    {t("risk")}: {item.analysis.risk_level}
                   </span>
 
                   <span
@@ -105,11 +157,11 @@ function History() {
                       color: color,
                     }}
                   >
-                    Severity: {item.analysis.severity}
+                    {t("severity")}: {item.analysis.severity}
                   </span>
                 </div>
 
-                <p><strong>Date:</strong> {item.date}</p>
+                <p><strong>{t("date")}:</strong> {item.date}</p>
 
                 <img
                   src={item.imagePreview}
@@ -117,11 +169,11 @@ function History() {
                   style={styles.image}
                 />
 
-                <p><strong>Disease:</strong> {item.analysis.disease}</p>
+                <p><strong>{t("disease")}:</strong> {item.analysis.disease}</p>
 
                 <div style={styles.confidenceBlock}>
                   <span>
-                    <strong>Confidence:</strong>{" "}
+                    <strong>{t("confidence")}:</strong>{" "}
                     {Math.round(item.analysis.confidence * 100)}%
                   </span>
 
@@ -140,9 +192,8 @@ function History() {
                   {item.analysis.recommendation}
                 </div>
 
-                {/* 🔹 ADDITION: TREATMENT EFFECTIVENESS */}
                 <div style={styles.treatmentBox}>
-                  <strong>Treatment Outcome</strong>
+                  <strong>{t("treatmentOutcome")}</strong>
 
                   {item.treatmentOutcome ? (
                     <p>
@@ -159,7 +210,7 @@ function History() {
                           saveOutcome(item.id, "Improved")
                         }
                       >
-                        Improved
+                        {t("improved")}
                       </button>
                       <button
                         style={styles.warnBtn}
@@ -167,7 +218,7 @@ function History() {
                           saveOutcome(item.id, "No Change")
                         }
                       >
-                        Same
+                        {t("same")}
                       </button>
                       <button
                         style={styles.badBtn}
@@ -175,7 +226,7 @@ function History() {
                           saveOutcome(item.id, "Worsened")
                         }
                       >
-                        Worsened
+                        {t("worsened")}
                       </button>
                     </div>
                   )}
@@ -186,7 +237,7 @@ function History() {
                 style={styles.exportBtn}
                 onClick={() => exportPDF(item)}
               >
-                Export PDF
+                {t("export")}
               </button>
             </div>
           );
@@ -255,7 +306,6 @@ const styles = {
     color: "#16808D",
   },
 
-  /* 🔹 ADDITION STYLES */
   treatmentBox: {
     marginTop: "14px",
     backgroundColor: "#F9FAFB",
