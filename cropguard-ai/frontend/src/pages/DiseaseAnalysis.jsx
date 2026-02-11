@@ -149,7 +149,12 @@ function DiseaseAnalysis() {
     decision_explanation = [],
   } = analysis;
 
-  
+  useEffect(() => {
+    if (analysis?.heatmap) {
+      setHeatmap(analysis.heatmap);
+    }
+  }, [analysis]);
+
   const riskColor =
     risk_level === "High"
       ? "#DC2626"
@@ -164,27 +169,33 @@ function DiseaseAnalysis() {
       ? "#F59E0B"
       : "#16A34A";
 
-  
-  let forecastRisk = "Low";
-  let forecastColor = "#16A34A";
-  let forecastMessage =
-    "Disease risk is expected to remain low over the next 14 days.";
+  const sameDiseaseCount = Array.isArray(history)
+    ? history.filter((item) => item.analysis?.disease === disease).length
+    : 0;
 
-  if (severity === "High" && confidence >= 0.75) {
-    forecastRisk = "High";
-    forecastColor = "#DC2626";
-    forecastMessage =
-      "High probability of disease progression in the next 7–14 days without immediate intervention.";
-  } else if (severity === "Medium") {
-    forecastRisk = "Moderate";
-    forecastColor = "#F59E0B";
-    forecastMessage =
-      "Moderate risk detected. Close monitoring and preventive actions are advised.";
+  let learningLevel = "Info";
+  let learningMessage =
+    "This is the first recorded occurrence of this disease.";
+
+  if (sameDiseaseCount >= 2 && sameDiseaseCount <= 3) {
+    learningLevel = "Warning";
+    learningMessage =
+      "Repeated disease patterns detected. AI is learning recurrence trends.";
+  } else if (sameDiseaseCount >= 4) {
+    learningLevel = "Critical";
+    learningMessage =
+      "Critical recurrence detected. Historical patterns escalated risk.";
   }
+
+  const learningColor =
+    learningLevel === "Critical"
+      ? "#DC2626"
+      : learningLevel === "Warning"
+      ? "#F59E0B"
+      : "#16A34A";
 
   return (
     <div style={styles.page}>
-      
       <header style={styles.header}>
         <div style={styles.brand}>
           <img src={logo} alt="CropGuard AI" style={styles.logo} />
@@ -192,7 +203,6 @@ function DiseaseAnalysis() {
         </div>
       </header>
 
-    
       <div style={styles.center}>
         <div style={styles.card}>
           <h2 style={styles.heading}>{t("title")}</h2>
@@ -219,7 +229,18 @@ function DiseaseAnalysis() {
                 />
               </div>
 
-          
+              <div style={styles.imageCompare}>
+                <img src={imagePreview} style={styles.baseImage} />
+                {showHeatmap && (
+                  <img
+                    src={`data:image/png;base64,${heatmap}`}
+                    style={{ ...styles.overlayImage, opacity }}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
           <div style={styles.badgeRow}>
             <span style={{ ...styles.riskBadge, backgroundColor: riskColor }}>
               {t("risk")}: {risk_level}
@@ -244,7 +265,17 @@ function DiseaseAnalysis() {
             </div>
           </div>
 
-          
+          {farmerProfile && (
+            <div style={styles.contextBox}>
+              <h4>{t("farmContext")}</h4>
+              <p><strong>{t("location")}:</strong> {farmerProfile.location}</p>
+              <p><strong>{t("crop")}:</strong> {farmerProfile.cropType}</p>
+              <p><strong>{t("stage")}:</strong> {farmerProfile.growthStage}</p>
+              <p><strong>{t("age")}:</strong> {farmerProfile.cropAgeDays} days</p>
+              <p><strong>{t("cultivation")}:</strong> {farmerProfile.cultivationType}</p>
+            </div>
+          )}
+
           <div style={styles.details}>
             <p><strong>{t("disease")}:</strong> {disease}</p>
             <p><strong>{t("priority")}:</strong> {action_priority}</p>
@@ -262,31 +293,6 @@ function DiseaseAnalysis() {
             <p style={{ marginTop: "6px" }}>{learningMessage}</p>
           </div>
 
-          
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              padding: "16px",
-              borderRadius: "14px",
-              marginBottom: "20px",
-              boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
-              borderLeft: `6px solid ${forecastColor}`,
-            }}
-          >
-            <h4 style={{ color: "#142C52", marginBottom: "6px" }}>
-              Risk Forecast (Next 14 Days)
-            </h4>
-
-            <p style={{ fontWeight: "600", color: forecastColor }}>
-              Forecasted Risk Level: {forecastRisk}
-            </p>
-
-            <p style={{ color: "#142C52", marginTop: "6px" }}>
-              {forecastMessage}
-            </p>
-          </div>
-
-          
           <div style={styles.whyRow}>
             <span>{t("whyText")}</span>
             <button
@@ -297,7 +303,6 @@ function DiseaseAnalysis() {
             </button>
           </div>
 
-        
           <div style={styles.actionSection}>
             <h3
               style={styles.actionHeading}
@@ -321,7 +326,6 @@ function DiseaseAnalysis() {
         </div>
       </div>
 
-      
       {showExplain && (
         <div style={styles.overlay}>
           <div style={styles.explainCard}>
@@ -358,8 +362,6 @@ function DiseaseAnalysis() {
   );
 }
 
-
-
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
   header: { backgroundColor: "#142C52", padding: "14px 32px" },
@@ -367,111 +369,31 @@ const styles = {
   logo: { height: "36px", backgroundColor: "#fff", padding: "6px", borderRadius: "8px" },
   brandText: { color: "#1B9AAA", margin: 0 },
   center: { display: "flex", justifyContent: "center", paddingTop: "80px" },
-  card: {
-    backgroundColor: "#ffffff",
-    padding: "40px",
-    borderRadius: "18px",
-    width: "520px",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-  },
-  heading: {
-    textAlign: "center",
-    color: "#142C52",
-    marginBottom: "20px",
-  },
-  image: {
-    width: "100%",
-    borderRadius: "12px",
-    marginBottom: "18px",
-  },
-
-  badgeRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "14px",
-  },
-  riskBadge: {
-    color: "#ffffff",
-    padding: "6px 12px",
-    borderRadius: "20px",
-    fontSize: "13px",
-    fontWeight: "600",
-  },
+  card: { backgroundColor: "#fff", padding: "40px", borderRadius: "18px", width: "520px", boxShadow: "0 20px 40px rgba(0,0,0,0.12)" },
+  heading: { textAlign: "center", marginBottom: "20px" },
+  heatmapBox: { backgroundColor: "#F9FAFB", padding: "16px", borderRadius: "14px", marginBottom: "20px" },
+  heatmapTitle: { marginBottom: "10px" },
+  toggleRow: { display: "flex", justifyContent: "space-between", marginBottom: "10px" },
+  toggleBtn: { backgroundColor: "#1B9AAA", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 12px" },
+  imageCompare: { position: "relative" },
+  baseImage: { width: "100%" },
+  overlayImage: { position: "absolute", top: 0, left: 0, width: "100%" },
+  badgeRow: { display: "flex", justifyContent: "space-between", marginBottom: "14px" },
+  riskBadge: { color: "#fff", padding: "6px 12px", borderRadius: "20px" },
   severityText: { fontWeight: "600" },
-
   confidenceWrapper: { marginBottom: "16px" },
-  confidenceLabel: { fontSize: "13px", marginBottom: "6px" },
-  confidenceTrack: {
-    height: "8px",
-    backgroundColor: "#e5e7eb",
-    borderRadius: "6px",
-    overflow: "hidden",
-  },
+  confidenceLabel: { fontSize: "13px" },
+  confidenceTrack: { height: "8px", backgroundColor: "#e5e7eb", borderRadius: "6px" },
   confidenceFill: { height: "100%" },
-
-  details: { color: "#142C52", marginBottom: "12px" },
-  recommendation: {
-    backgroundColor: "#E6F6F8",
-    color: "#16808D",
-    padding: "14px",
-    borderRadius: "12px",
-    marginBottom: "16px",
-  },
-
-  whyRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "20px",
-  },
-  whyText: { fontWeight: "500", color: "#142C52" },
-  whyButton: {
-    backgroundColor: "#1B9AAA",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "8px",
-    padding: "6px 14px",
-    cursor: "pointer",
-  },
-
-  actionHeading: { color: "#1B9AAA", cursor: "pointer" },
-  actionBlock: { color: "#142C52" },
-
-  button: {
-    marginTop: "20px",
-    width: "100%",
-    padding: "14px",
-    backgroundColor: "#1B9AAA",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "12px",
-    cursor: "pointer",
-  },
-
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  explainCard: {
-    backgroundColor: "#ffffff",
-    padding: "36px",
-    borderRadius: "18px",
-    width: "480px",
-  },
-  explainHeading: { color: "#142C52" },
-  closeButton: {
-    marginTop: "20px",
-    width: "100%",
-    padding: "12px",
-    backgroundColor: "#1B9AAA",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "10px",
-    cursor: "pointer",
-  },
+  contextBox: { backgroundColor: "#F1F5F9", padding: "14px", borderRadius: "12px", marginBottom: "16px" },
+  recommendation: { backgroundColor: "#E6F6F8", padding: "14px", borderRadius: "12px", marginBottom: "16px" },
+  learningBox: { backgroundColor: "#F9FAFB", padding: "14px", borderRadius: "10px", marginBottom: "16px" },
+  whyRow: { display: "flex", justifyContent: "space-between", marginBottom: "20px" },
+  whyButton: { backgroundColor: "#1B9AAA", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 14px" },
+  button: { width: "100%", padding: "14px", backgroundColor: "#1B9AAA", color: "#fff", border: "none", borderRadius: "12px" },
+  overlay: { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.4)", display: "flex", justifyContent: "center", alignItems: "center" },
+  explainCard: { backgroundColor: "#fff", padding: "36px", borderRadius: "18px", width: "480px" },
+  closeButton: { marginTop: "20px", width: "100%", padding: "12px", backgroundColor: "#1B9AAA", color: "#fff", border: "none", borderRadius: "10px" },
 };
 
 export default DiseaseAnalysis;
