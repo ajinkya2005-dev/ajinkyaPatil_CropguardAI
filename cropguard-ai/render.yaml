@@ -12,4 +12,5 @@ services:
       npm run build
 
     startCommand: |
-      uvicorn backend.api.index:app --host 0.0.0.0 --port 10000
+      uvicorn cropguard-ai.backend.api.index:app --host 0.0.0.0 --port 10000
+
