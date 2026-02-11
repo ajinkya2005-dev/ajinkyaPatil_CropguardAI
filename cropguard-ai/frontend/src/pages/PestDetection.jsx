@@ -123,7 +123,8 @@ function PestDetection() {
   useEffect(() => {
     if (!stored) return;
 
-    fetch("http://127.0.0.1:5000/api/pest-recommendations", {
+    fetch("/api/pest-recommendations", {
+
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

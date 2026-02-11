@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-import random
 import base64
 import cv2
 import numpy as np
@@ -9,6 +8,7 @@ import io
 import requests
 from PIL import Image
 from torchvision import models, transforms
+from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -20,6 +20,7 @@ app.add_middleware(
 )
 
 OPENWEATHER_API_KEY = "c0232e9d9f1fc28d945cb75ae2b4a586"
+
 
 model = models.mobilenet_v2(weights="DEFAULT")
 model.eval()
@@ -36,9 +37,71 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {"status": "CropGuard AI context-aware engine running"}
+
+
+
+@app.post("/api/weather-risk")
+async def weather_risk(payload: dict):
+    location = payload.get("location", "India")
+
+    try:
+        geo = requests.get(
+            "http://api.openweathermap.org/geo/1.0/direct",
+            params={"q": location, "limit": 1, "appid": OPENWEATHER_API_KEY},
+        ).json()
+
+        if not geo:
+            return {"forecast": []}
+
+        lat, lon = geo[0]["lat"], geo[0]["lon"]
+
+        weather = requests.get(
+            "https://api.openweathermap.org/data/2.5/forecast",
+            params={
+                "lat": lat,
+                "lon": lon,
+                "appid": OPENWEATHER_API_KEY,
+                "units": "metric",
+            },
+        ).json()
+
+        forecast = []
+
+        # take approx 7 days (every 8th record ~ 24hr step)
+        for i in range(0, min(len(weather["list"]), 56), 8):
+            item = weather["list"][i]
+
+            humidity = item["main"]["humidity"]
+            temp = item["main"]["temp"]
+            rainChance = int(item.get("pop", 0) * 100)
+
+            risk = "Low"
+            insight = "Healthy recovery phase"
+
+            if humidity > 70 or rainChance > 50:
+                risk = "High"
+                insight = "High moisture may increase disease spread"
+            elif humidity > 60:
+                risk = "Medium"
+                insight = "Monitor crop for fungal activity"
+
+            forecast.append({
+                "date": (datetime.now() + timedelta(days=len(forecast))).strftime("Day %d"),
+                "risk": risk,
+                "insight": insight,
+                "temp": int(temp),
+                "humidity": humidity,
+                "rainChance": rainChance,
+            })
+
+        return {"forecast": forecast}
+
+    except Exception:
+        return {"forecast": []}
+
 
 
 def fake_heatmap():
@@ -47,6 +110,7 @@ def fake_heatmap():
     heatmap_color = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
     _, buffer = cv2.imencode(".png", heatmap_color)
     return base64.b64encode(buffer).decode("utf-8")
+
 
 
 def fetch_weather_risk(location, growth_stage):
@@ -96,6 +160,7 @@ def fetch_weather_risk(location, growth_stage):
         return "Moderate", reasons
     else:
         return "Low", reasons
+
 
 
 @app.post("/api/analyze")
@@ -179,6 +244,7 @@ async def analyze(
             "ai_version": "v1.6-weather-context-fusion",
         }
     }
+
 
 
 @app.post("/api/pest-recommendations")

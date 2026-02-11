@@ -104,9 +104,7 @@ function ImageUpload() {
     }
   };
 
-  /* ================================
-     BACKEND CALL
-  =================================*/
+  
   const sendToBackend = async (file) => {
     try {
       setLoading(true);
@@ -114,7 +112,8 @@ function ImageUpload() {
       const formData = new FormData();
       formData.append("image", file);
 
-      const res = await fetch("http://127.0.0.1:5000/api/analyze", {
+      const res = await fetch("/api/analyze", {
+
         method: "POST",
         body: formData,
       });

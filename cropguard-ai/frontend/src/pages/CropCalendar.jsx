@@ -68,13 +68,12 @@ function CropCalendar() {
     }
   }, []);
 
-  /* ================================
-     ELITE WEATHER + FALLBACK ENGINE
-  =================================*/
+
   const fetchWeatherRisk = async (location) => {
     try {
       setLoadingWeather(true);
-      const res = await fetch("http://localhost:5000/api/weather-risk", {
+      fetch("/api/weather-risk", {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ location }),
