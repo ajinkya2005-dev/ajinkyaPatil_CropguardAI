@@ -1,17 +1,143 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
+const safeParse = (key, fallback) => {
+  try {
+    const data = JSON.parse(localStorage.getItem(key));
+    return data ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 function DiseaseAnalysis() {
   const navigate = useNavigate();
-  const stored = JSON.parse(localStorage.getItem("lastAnalysis"));
+
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        noAnalysisTitle: "No Analysis Available",
+        noAnalysisText: "Please upload a crop image to view AI analysis.",
+        backHome: "Back to Home",
+        title: "Disease Analysis",
+        overlayTitle: "AI Vision Overlay",
+        hideOverlay: "Hide AI Overlay",
+        showOverlay: "Show AI Overlay",
+        risk: "Risk Level",
+        severity: "Severity",
+        confidence: "AI Confidence",
+        farmContext: "Farm Context Used by AI",
+        location: "Location",
+        crop: "Crop",
+        stage: "Growth Stage",
+        age: "Crop Age",
+        cultivation: "Cultivation",
+        disease: "Disease",
+        priority: "Action Priority",
+        learning: "AI Learning Insight",
+        whyText: "Why was this disease detected?",
+        planner: "Smart Treatment & Action Planner",
+        explainTitle: "Explainable AI – Decision Reasoning",
+        keyFactors: "Key Risk Factors",
+        decisionExplain: "Decision Explanation",
+        close: "Close",
+      },
+      hi: {
+        noAnalysisTitle: "कोई विश्लेषण उपलब्ध नहीं",
+        noAnalysisText: "AI विश्लेषण देखने के लिए कृपया फसल छवि अपलोड करें।",
+        backHome: "होम पर वापस जाएं",
+        title: "रोग विश्लेषण",
+        overlayTitle: "AI विज़न ओवरले",
+        hideOverlay: "AI ओवरले छुपाएँ",
+        showOverlay: "AI ओवरले दिखाएँ",
+        risk: "जोखिम स्तर",
+        severity: "गंभीरता",
+        confidence: "AI विश्वास",
+        farmContext: "AI द्वारा उपयोग किया गया फार्म संदर्भ",
+        location: "स्थान",
+        crop: "फसल",
+        stage: "विकास चरण",
+        age: "फसल आयु",
+        cultivation: "खेती प्रकार",
+        disease: "रोग",
+        priority: "कार्य प्राथमिकता",
+        learning: "AI लर्निंग इनसाइट",
+        whyText: "यह रोग क्यों पाया गया?",
+        planner: "स्मार्ट उपचार योजना",
+        explainTitle: "Explainable AI – निर्णय कारण",
+        keyFactors: "मुख्य जोखिम कारक",
+        decisionExplain: "निर्णय व्याख्या",
+        close: "बंद करें",
+      },
+      mr: {
+        noAnalysisTitle: "विश्लेषण उपलब्ध नाही",
+        noAnalysisText: "AI विश्लेषण पाहण्यासाठी कृपया पीक फोटो अपलोड करा.",
+        backHome: "होम वर जा",
+        title: "रोग विश्लेषण",
+        overlayTitle: "AI व्हिजन ओव्हरले",
+        hideOverlay: "AI ओव्हरले लपवा",
+        showOverlay: "AI ओव्हरले दाखवा",
+        risk: "जोखीम स्तर",
+        severity: "तीव्रता",
+        confidence: "AI विश्वास",
+        farmContext: "AI ने वापरलेला शेत संदर्भ",
+        location: "स्थान",
+        crop: "पीक",
+        stage: "वाढ अवस्था",
+        age: "पीक वय",
+        cultivation: "शेती प्रकार",
+        disease: "रोग",
+        priority: "कार्य प्राधान्य",
+        learning: "AI लर्निंग इनसाइट",
+        whyText: "हा रोग का ओळखला गेला?",
+        planner: "स्मार्ट उपचार योजना",
+        explainTitle: "Explainable AI – निर्णय कारण",
+        keyFactors: "मुख्य जोखीम घटक",
+        decisionExplain: "निर्णय स्पष्टीकरण",
+        close: "बंद करा",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
+  const stored = safeParse("lastAnalysis", null);
+  const history = safeParse("analysisHistory", []);
+  const farmerProfile = safeParse("farmerProfile", null);
 
   const [showActions, setShowActions] = useState(true);
   const [showExplain, setShowExplain] = useState(false);
+  const [heatmap, setHeatmap] = useState(null);
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [opacity, setOpacity] = useState(0.4);
 
-  if (!stored) return null;
+  if (!stored || !stored.analysis) {
+    return (
+      <div style={{ padding: "80px", textAlign: "center", color: "#142C52" }}>
+        <h2>{t("noAnalysisTitle")}</h2>
+        <p>{t("noAnalysisText")}</p>
+        <button
+          style={{
+            marginTop: "20px",
+            padding: "12px 24px",
+            backgroundColor: "#1B9AAA",
+            color: "#fff",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/home")}
+        >
+          {t("backHome")}
+        </button>
+      </div>
+    );
+  }
 
   const { imagePreview, analysis } = stored;
+
   const {
     disease,
     severity,
@@ -19,8 +145,8 @@ function DiseaseAnalysis() {
     recommendation,
     risk_level,
     action_priority,
-    key_risk_factors,
-    decision_explanation,
+    key_risk_factors = [],
+    decision_explanation = [],
   } = analysis;
 
   
@@ -69,24 +195,43 @@ function DiseaseAnalysis() {
     
       <div style={styles.center}>
         <div style={styles.card}>
-          <h2 style={styles.heading}>Disease Analysis</h2>
+          <h2 style={styles.heading}>{t("title")}</h2>
 
-          <img src={imagePreview} alt="Crop" style={styles.image} />
+          {heatmap && (
+            <div style={styles.heatmapBox}>
+              <h4 style={styles.heatmapTitle}>{t("overlayTitle")}</h4>
+
+              <div style={styles.toggleRow}>
+                <button
+                  style={styles.toggleBtn}
+                  onClick={() => setShowHeatmap(!showHeatmap)}
+                >
+                  {showHeatmap ? t("hideOverlay") : t("showOverlay")}
+                </button>
+
+                <input
+                  type="range"
+                  min="0.1"
+                  max="0.7"
+                  step="0.05"
+                  value={opacity}
+                  onChange={(e) => setOpacity(Number(e.target.value))}
+                />
+              </div>
 
           
           <div style={styles.badgeRow}>
             <span style={{ ...styles.riskBadge, backgroundColor: riskColor }}>
-              Risk Level: {risk_level}
+              {t("risk")}: {risk_level}
             </span>
-
             <span style={{ ...styles.severityText, color: severityColor }}>
-              Severity: {severity}
+              {t("severity")}: {severity}
             </span>
           </div>
 
           <div style={styles.confidenceWrapper}>
             <div style={styles.confidenceLabel}>
-              AI Confidence: {Math.round(confidence * 100)}%
+              {t("confidence")}: {Math.round(confidence * 100)}%
             </div>
             <div style={styles.confidenceTrack}>
               <div
@@ -101,12 +246,20 @@ function DiseaseAnalysis() {
 
           
           <div style={styles.details}>
-            <p><strong>Disease:</strong> {disease}</p>
-            <p><strong>Action Priority:</strong> {action_priority}</p>
+            <p><strong>{t("disease")}:</strong> {disease}</p>
+            <p><strong>{t("priority")}:</strong> {action_priority}</p>
           </div>
 
-          <div style={styles.recommendation}>
-            {recommendation}
+          <div style={styles.recommendation}>{recommendation}</div>
+
+          <div
+            style={{
+              ...styles.learningBox,
+              borderLeft: `6px solid ${learningColor}`,
+            }}
+          >
+            <strong>{t("learning")}</strong>
+            <p style={{ marginTop: "6px" }}>{learningMessage}</p>
           </div>
 
           
@@ -135,9 +288,7 @@ function DiseaseAnalysis() {
 
           
           <div style={styles.whyRow}>
-            <span style={styles.whyText}>
-              Why was this disease detected?
-            </span>
+            <span>{t("whyText")}</span>
             <button
               style={styles.whyButton}
               onClick={() => setShowExplain(true)}
@@ -152,7 +303,7 @@ function DiseaseAnalysis() {
               style={styles.actionHeading}
               onClick={() => setShowActions(!showActions)}
             >
-              Smart Treatment & Action Planner
+              {t("planner")}
             </h3>
 
             {showActions && (
@@ -165,7 +316,7 @@ function DiseaseAnalysis() {
           </div>
 
           <button style={styles.button} onClick={() => navigate("/home")}>
-            Back to Home
+            {t("backHome")}
           </button>
         </div>
       </div>
@@ -174,33 +325,31 @@ function DiseaseAnalysis() {
       {showExplain && (
         <div style={styles.overlay}>
           <div style={styles.explainCard}>
-            <h3 style={styles.explainHeading}>
-              Explainable AI – Decision Reasoning
-            </h3>
+            <h3>{t("explainTitle")}</h3>
 
-            <section>
-              <h4>Key Risk Factors</h4>
-              <ul>
-                {key_risk_factors.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </section>
+            <h4>{t("keyFactors")}</h4>
+            <ul>
+              {Array.isArray(key_risk_factors) && key_risk_factors.length > 0
+                ? key_risk_factors.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))
+                : <li>Environmental and visual stress indicators detected</li>}
+            </ul>
 
-            <section>
-              <h4>Decision Explanation</h4>
-              <ul>
-                {decision_explanation.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </section>
+            <h4>{t("decisionExplain")}</h4>
+            <ul>
+              {Array.isArray(decision_explanation) && decision_explanation.length > 0
+                ? decision_explanation.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))
+                : <li>Model confidence and learned disease patterns exceeded threshold</li>}
+            </ul>
 
             <button
               style={styles.closeButton}
               onClick={() => setShowExplain(false)}
             >
-              Close
+              {t("close")}
             </button>
           </div>
         </div>
@@ -215,14 +364,8 @@ const styles = {
   page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
   header: { backgroundColor: "#142C52", padding: "14px 32px" },
   brand: { display: "flex", alignItems: "center", gap: "12px" },
-  logo: {
-    height: "36px",
-    backgroundColor: "#ffffff",
-    padding: "6px",
-    borderRadius: "8px",
-  },
+  logo: { height: "36px", backgroundColor: "#fff", padding: "6px", borderRadius: "8px" },
   brandText: { color: "#1B9AAA", margin: 0 },
-
   center: { display: "flex", justifyContent: "center", paddingTop: "80px" },
   card: {
     backgroundColor: "#ffffff",

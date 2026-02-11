@@ -12,21 +12,112 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const safeJSONParse = (key, fallback) => {
+  try {
+    const data = JSON.parse(localStorage.getItem(key));
+    return data ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 function Dashboard() {
   const [analysis, setAnalysis] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        loadingTitle: "Dashboard Loading…",
+        loadingSub: "Preparing analysis data safely.",
+        noDataTitle: "No Analysis Data Yet",
+        noDataSub:
+          "Upload a crop image to generate AI insights and unlock the dashboard.",
+        heading: "Dashboard Overview",
+        total: "Total Analyses",
+        recurring: "Recurring Disease",
+        learning: "Learning Status",
+        distribution: "Disease Severity Distribution",
+        latest: "Latest Analysis Summary",
+        risk: "Risk",
+        severity: "Severity",
+        disease: "Disease",
+        download: "Download Latest Report (PDF)",
+        alertCritical:
+          "Critical disease recurrence detected. Immediate intervention advised.",
+        alertWarning:
+          "Repeated disease patterns observed. Monitor crop closely.",
+        alertNormal:
+          "Crop health currently stable. Continue routine monitoring.",
+      },
+      hi: {
+        loadingTitle: "डैशबोर्ड लोड हो रहा है…",
+        loadingSub: "डेटा सुरक्षित रूप से तैयार किया जा रहा है।",
+        noDataTitle: "अभी तक कोई विश्लेषण डेटा नहीं",
+        noDataSub:
+          "डैशबोर्ड देखने के लिए फसल की छवि अपलोड करें।",
+        heading: "डैशबोर्ड अवलोकन",
+        total: "कुल विश्लेषण",
+        recurring: "दोहराया गया रोग",
+        learning: "सीखने की स्थिति",
+        distribution: "रोग गंभीरता वितरण",
+        latest: "नवीनतम विश्लेषण सारांश",
+        risk: "जोखिम",
+        severity: "गंभीरता",
+        disease: "रोग",
+        download: "रिपोर्ट डाउनलोड करें (PDF)",
+        alertCritical:
+          "गंभीर रोग पुनरावृत्ति पाई गई। तुरंत कार्रवाई करें।",
+        alertWarning:
+          "रोग पैटर्न दोहराए जा रहे हैं। फसल पर नजर रखें।",
+        alertNormal:
+          "फसल स्वास्थ्य स्थिर है। नियमित निगरानी जारी रखें।",
+      },
+      mr: {
+        loadingTitle: "डॅशबोर्ड लोड होत आहे…",
+        loadingSub: "डेटा सुरक्षितपणे तयार होत आहे.",
+        noDataTitle: "अद्याप विश्लेषण डेटा नाही",
+        noDataSub:
+          "डॅशबोर्ड पाहण्यासाठी पिकाचा फोटो अपलोड करा.",
+        heading: "डॅशबोर्ड आढावा",
+        total: "एकूण विश्लेषण",
+        recurring: "पुन्हा दिसणारा रोग",
+        learning: "शिकण्याची स्थिती",
+        distribution: "रोग तीव्रता वितरण",
+        latest: "नवीनतम विश्लेषण सारांश",
+        risk: "जोखीम",
+        severity: "तीव्रता",
+        disease: "रोग",
+        download: "PDF रिपोर्ट डाउनलोड करा",
+        alertCritical:
+          "गंभीर रोग पुनरावृत्ती आढळली. त्वरित कृती करा.",
+        alertWarning:
+          "रोग पॅटर्न पुन्हा दिसत आहेत. लक्ष ठेवा.",
+        alertNormal:
+          "पिकाची स्थिती स्थिर आहे. निरीक्षण सुरू ठेवा.",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("lastAnalysis"));
-    if (stored) {
-      setAnalysis(stored);
-    }
+    const stored = safeJSONParse("lastAnalysis", null);
+    const storedHistory = safeJSONParse("analysisHistory", []);
+
+    if (stored) setAnalysis(stored);
+    setHistory(Array.isArray(storedHistory) ? storedHistory : []);
   }, []);
 
-  const chartData = [
-    { name: "Low", value: 4 },
-    { name: "Medium", value: 6 },
-    { name: "High", value: 2 },
-  ];
+  if (!Array.isArray(history)) {
+    return (
+      <div style={{ padding: "60px", textAlign: "center", color: "#142C52" }}>
+        <h2>{t("loadingTitle")}</h2>
+        <p>{t("loadingSub")}</p>
+      </div>
+    );
+  }
 
   const getColor = (level) =>
     level === "High"
@@ -34,6 +125,76 @@ function Dashboard() {
       : level === "Medium"
       ? "#F59E0B"
       : "#16A34A";
+
+  const diseaseFrequency = {};
+  history.forEach((item) => {
+    const d = item.analysis?.disease;
+    if (d) diseaseFrequency[d] = (diseaseFrequency[d] || 0) + 1;
+  });
+
+  const mostFrequentDisease = Object.keys(diseaseFrequency).reduce(
+    (a, b) => (diseaseFrequency[a] > diseaseFrequency[b] ? a : b),
+    ""
+  );
+
+  const recurrenceCount = diseaseFrequency[mostFrequentDisease] || 0;
+
+  let learningLevel = "Normal";
+  if (recurrenceCount >= 2 && recurrenceCount <= 3)
+    learningLevel = "Warning";
+  else if (recurrenceCount >= 4)
+    learningLevel = "Critical";
+
+  const learningColor = getColor(
+    learningLevel === "Normal" ? "Low" : learningLevel
+  );
+
+  const severityMap = { Low: 1, Medium: 2, High: 3 };
+
+  let severityTrend = "Stable";
+  let severityTrendColor = "#16A34A";
+  let severityTrendMessage =
+    "Disease severity has remained stable over time.";
+
+  if (history.length >= 2) {
+    const first = severityMap[history[0].analysis?.severity] || 1;
+    const last =
+      severityMap[history[history.length - 1].analysis?.severity] || 1;
+
+    if (last > first) {
+      severityTrend = "Worsening";
+      severityTrendColor = "#DC2626";
+      severityTrendMessage =
+        "Disease severity has increased over successive analyses.";
+    } else if (last < first) {
+      severityTrend = "Improving";
+      severityTrendColor = "#16A34A";
+      severityTrendMessage =
+        "Disease severity is improving based on recent results.";
+    }
+  }
+
+  const dynamicChartData = [
+    {
+      name: "Low",
+      value: history.filter((h) => h.analysis?.severity === "Low").length,
+    },
+    {
+      name: "Medium",
+      value: history.filter((h) => h.analysis?.severity === "Medium").length,
+    },
+    {
+      name: "High",
+      value: history.filter((h) => h.analysis?.severity === "High").length,
+    },
+  ];
+
+  const alertMessage =
+    learningLevel === "Critical"
+      ? t("alertCritical")
+      : learningLevel === "Warning"
+      ? t("alertWarning")
+      : t("alertNormal");
 
   const downloadPDF = async () => {
     const element = document.getElementById("dashboard-export");
@@ -51,8 +212,28 @@ function Dashboard() {
   };
 
   const severityColor = analysis
-    ? getColor(analysis.analysis.risk_level)
+    ? getColor(analysis.analysis?.risk_level)
     : "#16A34A";
+
+  if (!analysis && history.length === 0) {
+    return (
+      <div style={styles.page}>
+        <header style={styles.header}>
+          <div style={styles.brand}>
+            <img src={logo} alt="CropGuard AI" style={styles.logo} />
+            <h2 style={styles.brandText}>CropGuard AI</h2>
+          </div>
+        </header>
+
+        <div style={{ padding: "80px", textAlign: "center", color: "#142C52" }}>
+          <h2>{t("noDataTitle")}</h2>
+          <p style={{ marginTop: "10px", opacity: 0.8 }}>
+            {t("noDataSub")}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.page}>
@@ -64,29 +245,36 @@ function Dashboard() {
       </header>
 
       <div style={styles.container}>
-        <h2 style={styles.heading}>Dashboard Overview</h2>
+        <h2 style={styles.heading}>{t("heading")}</h2>
 
-        {/* OVERVIEW CARDS */}
+        <div
+          style={{
+            ...styles.alertBox,
+            borderLeft: `6px solid ${learningColor}`,
+          }}
+        >
+          {alertMessage}
+        </div>
+
         <div style={styles.cards}>
           <div style={styles.card}>
-            <h4>Total Analyses</h4>
-            <p>12</p>
+            <h4>{t("total")}</h4>
+            <p>{history.length}</p>
           </div>
           <div style={styles.card}>
-            <h4>High Risk Crops</h4>
-            <p>2</p>
+            <h4>{t("recurring")}</h4>
+            <p>{mostFrequentDisease || "None"}</p>
           </div>
           <div style={styles.card}>
-            <h4>Active Alerts</h4>
-            <p>3</p>
+            <h4>{t("learning")}</h4>
+            <p style={{ color: learningColor }}>{learningLevel}</p>
           </div>
         </div>
 
-        {/* CHART */}
         <div style={styles.chartCard}>
-          <h4>Disease Severity Distribution</h4>
+          <h4>{t("distribution")}</h4>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
+            <BarChart data={dynamicChartData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
@@ -95,13 +283,11 @@ function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* EXPORT + VISUAL INDICATORS */}
         {analysis && (
           <div style={styles.exportSection}>
             <div style={styles.exportCard} id="dashboard-export">
-              <h3>Latest Analysis Summary</h3>
+              <h3>{t("latest")}</h3>
 
-              {/* VISUAL INDICATORS */}
               <div style={styles.indicatorRow}>
                 <span
                   style={{
@@ -109,7 +295,7 @@ function Dashboard() {
                     backgroundColor: severityColor,
                   }}
                 >
-                  Risk: {analysis.analysis.risk_level}
+                  {t("risk")}: {analysis.analysis.risk_level}
                 </span>
 
                 <span
@@ -118,7 +304,7 @@ function Dashboard() {
                     color: severityColor,
                   }}
                 >
-                  Severity: {analysis.analysis.severity}
+                  {t("severity")}: {analysis.analysis.severity}
                 </span>
               </div>
 
@@ -129,38 +315,17 @@ function Dashboard() {
               />
 
               <p>
-                <strong>Disease:</strong>{" "}
+                <strong>{t("disease")}:</strong>{" "}
                 {analysis.analysis.disease}
               </p>
-
-              {/* CONFIDENCE BAR */}
-              <div style={styles.confidenceBlock}>
-                <span>
-                  <strong>Confidence:</strong>{" "}
-                  {Math.round(analysis.analysis.confidence * 100)}%
-                </span>
-
-                <div style={styles.track}>
-                  <div
-                    style={{
-                      ...styles.fill,
-                      width: `${analysis.analysis.confidence * 100}%`,
-                      backgroundColor: severityColor,
-                    }}
-                  />
-                </div>
-              </div>
 
               <div style={styles.recommendation}>
                 {analysis.analysis.recommendation}
               </div>
             </div>
 
-            <button
-              style={styles.downloadBtn}
-              onClick={downloadPDF}
-            >
-              Download Latest Report (PDF)
+            <button style={styles.downloadBtn} onClick={downloadPDF}>
+              {t("download")}
             </button>
           </div>
         )}
@@ -170,35 +335,21 @@ function Dashboard() {
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: "#f4f6f8",
-  },
-  header: {
-    backgroundColor: "#142C52",
-    padding: "14px 32px",
-  },
-  brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  logo: {
-    height: "36px",
+  page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
+  header: { backgroundColor: "#142C52", padding: "14px 32px" },
+  brand: { display: "flex", alignItems: "center", gap: "12px" },
+  logo: { height: "36px", backgroundColor: "#ffffff", padding: "6px", borderRadius: "8px" },
+  brandText: { color: "#1B9AAA", margin: 0 },
+  container: { padding: "60px 80px" },
+  heading: { color: "#142C52", marginBottom: "30px" },
+  alertBox: {
     backgroundColor: "#ffffff",
-    padding: "6px",
-    borderRadius: "8px",
-  },
-  brandText: {
-    color: "#1B9AAA",
-    margin: 0,
-  },
-  container: {
-    padding: "60px 80px",
-  },
-  heading: {
-    color: "#142C52",
+    padding: "18px",
+    borderRadius: "14px",
     marginBottom: "30px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+    color: "#142C52",
+    fontWeight: "600",
   },
   cards: {
     display: "grid",
@@ -211,19 +362,15 @@ const styles = {
     padding: "24px",
     borderRadius: "16px",
     boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-    color: "#142C52",
   },
   chartCard: {
     backgroundColor: "#ffffff",
     padding: "30px",
     borderRadius: "18px",
     boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
-    marginBottom: "50px",
+    marginBottom: "40px",
   },
-
-  exportSection: {
-    marginTop: "40px",
-  },
+  exportSection: { marginTop: "40px" },
   exportCard: {
     backgroundColor: "#ffffff",
     padding: "30px",
@@ -231,8 +378,6 @@ const styles = {
     boxShadow: "0 15px 35px rgba(0,0,0,0.08)",
     maxWidth: "600px",
   },
-
-  /* VISUAL INDICATORS */
   indicatorRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -245,24 +390,7 @@ const styles = {
     fontSize: "12px",
     fontWeight: "600",
   },
-  severityText: {
-    fontWeight: "600",
-  },
-  confidenceBlock: {
-    marginTop: "10px",
-  },
-  track: {
-    height: "8px",
-    backgroundColor: "#e5e7eb",
-    borderRadius: "6px",
-    overflow: "hidden",
-    marginTop: "4px",
-  },
-  fill: {
-    height: "100%",
-    transition: "width 0.3s",
-  },
-
+  severityText: { fontWeight: "600" },
   image: {
     width: "100%",
     maxWidth: "320px",

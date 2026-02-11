@@ -1,58 +1,174 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import logo from "../assets/logo.png";
-
 
 function Home() {
   const navigate = useNavigate();
+  const farmerProfile = JSON.parse(localStorage.getItem("activeFarmer"));
+  const [showProfile, setShowProfile] = useState(false);
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        history: "History",
+        calendar: "Crop Calendar",
+        dashboard: "Dashboard",
+        contact: "Contact Us",
+        logout: "Logout",
+        title: "Smart Crop Disease Detection",
+        subtitle:
+          "Upload crop images and receive AI-powered disease detection, personalized treatment plans, and explainable insights.",
+        upload: "Upload Crop Image",
+        analysis: "Disease Analysis",
+        pests: "Pest Detection",
+      },
+      hi: {
+        history: "इतिहास",
+        calendar: "फसल कैलेंडर",
+        dashboard: "डैशबोर्ड",
+        contact: "संपर्क करें",
+        logout: "लॉगआउट",
+        title: "स्मार्ट फसल रोग पहचान",
+        subtitle:
+          "फसल की तस्वीर अपलोड करें और एआई आधारित रोग पहचान और उपचार सुझाव प्राप्त करें।",
+        upload: "फसल छवि अपलोड करें",
+        analysis: "रोग विश्लेषण",
+        pests: "कीट पहचान",
+      },
+      mr: {
+        history: "इतिहास",
+        calendar: "पीक कॅलेंडर",
+        dashboard: "डॅशबोर्ड",
+        contact: "संपर्क करा",
+        logout: "लॉगआउट",
+        title: "स्मार्ट पीक रोग शोध",
+        subtitle:
+          "पीक फोटो अपलोड करा आणि एआय आधारित रोग शोध व उपचार सल्ला मिळवा.",
+        upload: "पीक फोटो अपलोड",
+        analysis: "रोग विश्लेषण",
+        pests: "कीड ओळख",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
 
   return (
     <div style={styles.app}>
-      {/* NAVBAR */}
       <header style={styles.header}>
         <div style={styles.brand}>
           <img src={logo} alt="CropGuard AI Logo" style={styles.logo} />
           <h2 style={styles.logoText}>CropGuard AI</h2>
         </div>
 
-        <nav>
+        <nav style={{ display: "flex", alignItems: "center", gap: "24px" }}>
           <ul style={styles.navList}>
-            <li style={styles.navItem} onClick={() => navigate("/home")}>
-              Home
-            </li>
             <li style={styles.navItem} onClick={() => navigate("/history")}>
-  History 
-</li>
-
+              {t("history")}
+            </li>
+            <li style={styles.navItem} onClick={() => navigate("/calendar")}>
+              {t("calendar")}
+            </li>
             <li style={styles.navItem} onClick={() => navigate("/dashboard")}>
-              Dashboard
+              {t("dashboard")}
+            </li>
+            <li style={styles.navItem} onClick={() => navigate("/contact")}>
+              {t("contact")}
             </li>
           </ul>
+
+          {farmerProfile && (
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowProfile(!showProfile)}
+                style={{
+                  backgroundColor: "#1B9AAA",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "20px",
+                  padding: "6px 14px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                {farmerProfile.fullName}
+              </button>
+
+              {showProfile && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "44px",
+                    backgroundColor: "#ffffff",
+                    padding: "16px",
+                    borderRadius: "14px",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                    width: "220px",
+                    zIndex: 100,
+                    color: "#142C52",
+                  }}
+                >
+                  <p style={{ fontWeight: "600", marginBottom: "4px" }}>
+                    {farmerProfile.fullName}
+                  </p>
+                  <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                    {farmerProfile.cropType} • {farmerProfile.location}
+                  </p>
+
+                  <hr style={{ margin: "10px 0" }} />
+
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("activeFarmer");
+                      window.location.href = "/";
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      backgroundColor: "#DC2626",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {t("logout")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </nav>
       </header>
 
-      {/* MAIN CONTENT */}
       <main style={styles.main}>
         <div style={styles.card}>
-          <h1 style={styles.heading}>Smart Crop Disease Detection</h1>
-          <p style={styles.subText}>
-            Upload crop images and receive AI-powered disease detection,
-            personalized treatment plans, and explainable insights.
-          </p>
+          <h1 style={styles.heading}>{t("title")}</h1>
+          <p style={styles.subText}>{t("subtitle")}</p>
 
           <div style={styles.actions}>
             <button
               style={styles.primaryBtn}
               onClick={() => navigate("/upload")}
             >
-              Upload Crop Image
+              {t("upload")}
             </button>
 
             <button
               style={styles.secondaryBtn}
               onClick={() => navigate("/analysis")}
             >
-              Disease Analysis
+              {t("analysis")}
+            </button>
+
+            <button
+              style={styles.tertiaryBtn}
+              onClick={() => navigate("/pests")}
+            >
+              {t("pests")}
             </button>
           </div>
         </div>
@@ -129,6 +245,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     gap: "16px",
+    flexWrap: "wrap",
   },
   primaryBtn: {
     padding: "14px 28px",
@@ -142,6 +259,15 @@ const styles = {
   secondaryBtn: {
     padding: "14px 28px",
     backgroundColor: "#16808D",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "12px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+  tertiaryBtn: {
+    padding: "14px 28px",
+    backgroundColor: "#142C52",
     color: "#ffffff",
     border: "none",
     borderRadius: "12px",

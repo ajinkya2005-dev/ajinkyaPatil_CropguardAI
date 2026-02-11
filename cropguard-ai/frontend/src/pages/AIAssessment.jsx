@@ -7,6 +7,68 @@ function AIAssessment() {
   const storedAnalysis = JSON.parse(localStorage.getItem("lastAnalysis"));
   const farmProfile = JSON.parse(localStorage.getItem("farmerProfile"));
 
+  const language = localStorage.getItem("appLanguage") || "en";
+
+  const t = (key) => {
+    const translations = {
+      en: {
+        title: "AI Crop Health Assessment",
+        findings: "AI Findings",
+        crop: "Crop",
+        disease: "Disease / Pest",
+        severity: "Severity",
+        confidence: "Confidence",
+        stage: "Growth Stage",
+        location: "Location",
+        explain: "Explainable AI",
+        why: "Why?",
+        action: "Personalized Action Plan",
+        immediate: "Immediate Actions",
+        short: "Short-Term Actions",
+        preventive: "Preventive Strategy",
+        general: "General Crop Care Guidelines (Non-AI)",
+        back: "Back to Home",
+      },
+      hi: {
+        title: "एआई फसल स्वास्थ्य मूल्यांकन",
+        findings: "एआई निष्कर्ष",
+        crop: "फसल",
+        disease: "रोग / कीट",
+        severity: "गंभीरता",
+        confidence: "विश्वास स्तर",
+        stage: "विकास चरण",
+        location: "स्थान",
+        explain: "व्याख्यात्मक एआई",
+        why: "क्यों?",
+        action: "व्यक्तिगत कार्य योजना",
+        immediate: "तत्काल कार्य",
+        short: "कम अवधि के कार्य",
+        preventive: "रोकथाम रणनीति",
+        general: "सामान्य फसल देखभाल दिशानिर्देश",
+        back: "होम पर वापस जाएं",
+      },
+      mr: {
+        title: "एआय पीक आरोग्य मूल्यांकन",
+        findings: "एआय निष्कर्ष",
+        crop: "पीक",
+        disease: "रोग / कीड",
+        severity: "तीव्रता",
+        confidence: "विश्वास",
+        stage: "वाढीचा टप्पा",
+        location: "स्थान",
+        explain: "स्पष्टीकरणीय एआय",
+        why: "का?",
+        action: "वैयक्तिक कृती योजना",
+        immediate: "तत्काळ कृती",
+        short: "लघुकालीन कृती",
+        preventive: "प्रतिबंधात्मक रणनीती",
+        general: "सामान्य पीक काळजी मार्गदर्शक",
+        back: "होमवर जा",
+      },
+    };
+    return translations[language]?.[key] || key;
+  };
+
   const [showExplain, setShowExplain] = useState(false);
 
   if (!storedAnalysis || !farmProfile) {
@@ -18,7 +80,6 @@ function AIAssessment() {
 
   return (
     <div style={styles.page}>
-      {/* HEADER */}
       <header style={styles.header}>
         <div style={styles.brand}>
           <img src={logo} alt="CropGuard AI" style={styles.logo} />
@@ -27,28 +88,26 @@ function AIAssessment() {
       </header>
 
       <div style={styles.container}>
-        <h2 style={styles.pageTitle}>AI Crop Health Assessment</h2>
+        <h2 style={styles.pageTitle}>{t("title")}</h2>
 
-        {/* AI ASSESSMENT SUMMARY */}
         <div style={styles.cardHighlight}>
-          <h3 style={styles.sectionTitle}>AI Findings</h3>
-          <p><strong>Crop:</strong> {cropType}</p>
-          <p><strong>Disease / Pest:</strong> {analysis.disease}</p>
-          <p><strong>Severity:</strong> {analysis.severity}</p>
-          <p><strong>Confidence:</strong> {analysis.confidence * 100}%</p>
-          <p><strong>Growth Stage:</strong> {growthStage}</p>
-          <p><strong>Location:</strong> {location}</p>
+          <h3 style={styles.sectionTitle}>{t("findings")}</h3>
+          <p><strong>{t("crop")}:</strong> {cropType}</p>
+          <p><strong>{t("disease")}:</strong> {analysis.disease}</p>
+          <p><strong>{t("severity")}:</strong> {analysis.severity}</p>
+          <p><strong>{t("confidence")}:</strong> {analysis.confidence * 100}%</p>
+          <p><strong>{t("stage")}:</strong> {growthStage}</p>
+          <p><strong>{t("location")}:</strong> {location}</p>
         </div>
 
-        {/* EXPLAINABLE AI */}
         <div style={styles.card}>
           <div style={styles.rowBetween}>
-            <h3 style={styles.sectionTitle}>Explainable AI</h3>
+            <h3 style={styles.sectionTitle}>{t("explain")}</h3>
             <button
               style={styles.linkButton}
               onClick={() => setShowExplain(!showExplain)}
             >
-              Why?
+              {t("why")}
             </button>
           </div>
 
@@ -62,13 +121,12 @@ function AIAssessment() {
           )}
         </div>
 
-        {/* ACTION PLANNER */}
         <div style={styles.card}>
-          <h3 style={styles.sectionTitle}>Personalized Action Plan</h3>
+          <h3 style={styles.sectionTitle}>{t("action")}</h3>
 
           <div style={styles.actionGrid}>
             <div style={styles.actionCard}>
-              <h4>Immediate Actions</h4>
+              <h4>{t("immediate")}</h4>
               <ul>
                 <li>Apply crop-specific fungicide</li>
                 <li>Reduce excess moisture</li>
@@ -77,7 +135,7 @@ function AIAssessment() {
             </div>
 
             <div style={styles.actionCard}>
-              <h4>Short-Term Actions</h4>
+              <h4>{t("short")}</h4>
               <ul>
                 <li>Monitor crop every 3–4 days</li>
                 <li>Maintain field sanitation</li>
@@ -85,7 +143,7 @@ function AIAssessment() {
             </div>
 
             <div style={styles.actionCard}>
-              <h4>Preventive Strategy</h4>
+              <h4>{t("preventive")}</h4>
               <ul>
                 <li>Improve spacing and airflow</li>
                 <li>Use resistant crop varieties</li>
@@ -94,18 +152,16 @@ function AIAssessment() {
           </div>
         </div>
 
-        {/* GENERAL GUIDELINES */}
         <div style={styles.cardMuted}>
-          <h3 style={styles.sectionTitle}>General Crop Care Guidelines (Non-AI)</h3>
+          <h3 style={styles.sectionTitle}>{t("general")}</h3>
           <p>Ensure proper irrigation management.</p>
           <p>Follow recommended fertilization schedules.</p>
           <p>Regularly inspect crops for early signs of stress.</p>
         </div>
 
-        {/* FOOTER ACTIONS */}
         <div style={styles.footer}>
           <button style={styles.primaryBtn} onClick={() => navigate("/home")}>
-            Back to Home
+            {t("back")}
           </button>
         </div>
       </div>
