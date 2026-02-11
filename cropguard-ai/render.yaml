@@ -2,10 +2,14 @@ services:
   - type: web
     name: cropguard-ai
     env: python
+    plan: free
+    rootDir: cropguard-ai
+
     buildCommand: |
-      pip install -r requirements.txt
+      pip install -r backend/requirements.txt
       cd frontend
       npm install
       npm run build
-    startCommand: uvicorn api.index:app --host 0.0.0.0 --port 10000
-    plan: free
+
+    startCommand: |
+      uvicorn backend.api.index:app --host 0.0.0.0 --port 10000
