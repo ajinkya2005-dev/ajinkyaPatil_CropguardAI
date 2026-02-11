@@ -9,6 +9,10 @@ import requests
 from PIL import Image
 from torchvision import models, transforms
 from datetime import datetime, timedelta
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
 
 app = FastAPI()
 
@@ -287,3 +291,12 @@ async def local_agro_stores(payload: dict):
         "store_suggestions": stores,
         "ai_version": "v1.6-weather-context-fusion",
     }
+# ===============================
+# SERVE FRONTEND (RENDER)
+# ===============================
+
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
