@@ -68,16 +68,21 @@ function CropCalendar() {
     }
   }, []);
 
-
+  /* ================================
+     WEATHER RISK API (FIXED)
+  =================================*/
   const fetchWeatherRisk = async (location) => {
     try {
       setLoadingWeather(true);
-      fetch("/api/weather-risk", {
 
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ location }),
-      });
+      const res = await fetch(
+        "https://cropguard-ai-mirp.onrender.com/api/weather-risk",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ location }),
+        }
+      );
 
       const data = await res.json();
 
@@ -93,7 +98,6 @@ function CropCalendar() {
     }
   };
 
-  /* ===== FALLBACK SO CARDS ALWAYS SHOW ===== */
   const generateFallback = () => {
     setWeatherRisk([
       { date: "Day 1", risk: "High", insight: "Apply preventive spray", temp: 32, humidity: 70, rainChance: 40 },
@@ -144,19 +148,18 @@ function CropCalendar() {
           </div>
         )}
 
-        {/* 🔥 ELITE 7 DAY CARDS */}
         <h3 style={styles.sectionTitle}>{t("weatherTitle")}</h3>
 
         <div style={styles.grid}>
           {weatherRisk.map((day, i) => (
             <div key={i} style={styles.eliteCard}>
-              <div style={{...styles.pulse, backgroundColor:riskColor(day.risk)}} />
+              <div style={{ ...styles.pulse, backgroundColor: riskColor(day.risk) }} />
               <h4>{day.date}</h4>
               <p>🌡 {day.temp}°C</p>
               <p>💧 {day.humidity}%</p>
               <p>🌧 {day.rainChance}%</p>
 
-              <span style={{...styles.badge,backgroundColor:riskColor(day.risk)}}>
+              <span style={{ ...styles.badge, backgroundColor: riskColor(day.risk) }}>
                 {day.risk}
               </span>
 
@@ -194,23 +197,8 @@ const styles = {
   sectionTitle:{marginTop:"30px",marginBottom:"14px",color:"#142C52"},
   profileCard:{background:"#fff",padding:"18px",borderRadius:"14px",marginBottom:"24px",boxShadow:"0 10px 25px rgba(0,0,0,0.08)"},
   grid:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"20px"},
-  eliteCard:{
-    position:"relative",
-    background:"linear-gradient(145deg,#ffffff,#f7fbfc)",
-    padding:"20px",
-    borderRadius:"18px",
-    boxShadow:"0 15px 35px rgba(0,0,0,0.08)",
-    transition:"0.3s"
-  },
-  pulse:{
-    position:"absolute",
-    top:10,
-    right:10,
-    width:10,
-    height:10,
-    borderRadius:"50%",
-    animation:"pulse 1.5s infinite"
-  },
+  eliteCard:{position:"relative",background:"linear-gradient(145deg,#ffffff,#f7fbfc)",padding:"20px",borderRadius:"18px",boxShadow:"0 15px 35px rgba(0,0,0,0.08)",transition:"0.3s"},
+  pulse:{position:"absolute",top:10,right:10,width:10,height:10,borderRadius:"50%",animation:"pulse 1.5s infinite"},
   badge:{display:"inline-block",marginTop:"6px",color:"#fff",padding:"4px 10px",borderRadius:"12px",fontSize:"12px",fontWeight:"600"},
   note:{fontSize:"14px",marginTop:"6px"},
   reductionBar:{height:"6px",background:"#e5e7eb",borderRadius:"6px",marginTop:"10px"},
