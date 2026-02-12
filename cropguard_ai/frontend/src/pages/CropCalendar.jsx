@@ -75,9 +75,8 @@ function CropCalendar() {
     try {
       setLoadingWeather(true);
 
-      const res = await fetch(
-        "https://cropguard-ai-mirp.onrender.com/api/weather-risk",
-        {
+      const res = await fetch("https://cropguard-ai-api-mirp.onrender.com/api/weather-risk", {
+
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ location }),
