@@ -4,12 +4,11 @@ import logo from "../assets/logo.png";
 function ContactUs() {
   const navigate = useNavigate();
 
-  // ⭐ RESPONSIVE CHECK (SAFE FIX)
+  
   const isMobile = window.innerWidth < 768;
 
   return (
     <div style={styles.page}>
-      {/* HEADER */}
       <header style={styles.header}>
         <div style={styles.brand}>
           <img src={logo} alt="CropGuard AI" style={styles.logo} />
@@ -17,10 +16,10 @@ function ContactUs() {
         </div>
       </header>
 
-      {/* CONTENT */}
+      
       <div style={styles.container}>
         <div style={styles.wrapper}>
-          {/* CONTACT CARD */}
+          
           <div style={styles.glassCard}>
             <div style={styles.gradientBar} />
             <h2 style={styles.title}>Contact Us</h2>
@@ -41,7 +40,7 @@ function ContactUs() {
             </div>
           </div>
 
-          {/* ABOUT CARD */}
+          
           <div style={styles.glassCard}>
             <div style={styles.gradientBar} />
             <h2 style={styles.title}>About CropGuard AI</h2>
@@ -53,12 +52,12 @@ function ContactUs() {
             </p>
 
             <div style={styles.featureGrid}>
-              <div style={styles.feature}>🌱 AI Disease Detection</div>
-              <div style={styles.feature}>🧠 Explainable Insights</div>
-              <div style={styles.feature}>📊 Smart Dashboard</div>
-              <div style={styles.feature}>📅 Crop Calendar</div>
-              <div style={styles.feature}>🛡️ Pest Detection</div>
-              <div style={styles.feature}>📈 Risk Forecasting</div>
+              <div style={styles.feature}> AI Disease Detection</div>
+              <div style={styles.feature}> Explainable Insights</div>
+              <div style={styles.feature}> Smart Dashboard</div>
+              <div style={styles.feature}> Crop Calendar</div>
+              <div style={styles.feature}> Pest Detection</div>
+              <div style={styles.feature}> Risk Forecasting</div>
             </div>
 
             <p style={styles.partnerText}>
@@ -66,7 +65,7 @@ function ContactUs() {
               digital farming experiences.
             </p>
 
-            {/* DEV CREDIT */}
+            
             <div style={styles.devBox}>
               Developed by <strong>Ajinkya Patil</strong> —
               <span style={{ opacity: 0.6 }}>
@@ -84,9 +83,7 @@ function ContactUs() {
   );
 }
 
-/* ===============================
-   ⭐ PRO RESPONSIVE STYLES
-================================ */
+
 const isMobile = window.innerWidth < 768;
 
 const styles = {
