@@ -4,6 +4,9 @@ import logo from "../assets/logo.png";
 function ContactUs() {
   const navigate = useNavigate();
 
+  // ⭐ RESPONSIVE CHECK (SAFE FIX)
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div style={styles.page}>
       {/* HEADER */}
@@ -63,9 +66,9 @@ function ContactUs() {
               digital farming experiences.
             </p>
 
-            {/* 🔥 ADDED LINE — YOUR DEVELOPER CREDIT */}
+            {/* DEV CREDIT */}
             <div style={styles.devBox}>
-              Developed by <strong>Ajinkya Patil</strong> — 
+              Developed by <strong>Ajinkya Patil</strong> —
               <span style={{ opacity: 0.6 }}>
                 {" "}ajinkyapatil2005@gmail.com | Pune, India
               </span>
@@ -81,6 +84,11 @@ function ContactUs() {
   );
 }
 
+/* ===============================
+   ⭐ PRO RESPONSIVE STYLES
+================================ */
+const isMobile = window.innerWidth < 768;
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -89,7 +97,7 @@ const styles = {
 
   header: {
     backgroundColor: "#142C52",
-    padding: "14px 32px",
+    padding: isMobile ? "14px 18px" : "14px 32px",
   },
 
   brand: {
@@ -108,16 +116,19 @@ const styles = {
   brandText: {
     color: "#1B9AAA",
     margin: 0,
+    fontSize: isMobile ? "18px" : "22px",
   },
 
   container: {
-    padding: "70px 80px",
+    padding: isMobile ? "40px 18px" : "70px 80px",
   },
 
   wrapper: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-    gap: "30px",
+    gridTemplateColumns: isMobile
+      ? "1fr"
+      : "repeat(auto-fit, minmax(340px, 1fr))",
+    gap: "24px",
     marginBottom: "30px",
   },
 
@@ -127,7 +138,7 @@ const styles = {
       "linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))",
     backdropFilter: "blur(10px)",
     borderRadius: "20px",
-    padding: "32px",
+    padding: isMobile ? "24px" : "32px",
     boxShadow: "0 20px 45px rgba(0,0,0,0.08)",
     color: "#142C52",
     transition: "all 0.3s ease",
@@ -145,15 +156,17 @@ const styles = {
   },
 
   title: {
-    marginBottom: "20px",
+    marginBottom: "18px",
+    fontSize: isMobile ? "20px" : "24px",
   },
 
   infoRow: {
     display: "flex",
     alignItems: "center",
-    gap: "14px",
-    marginBottom: "16px",
-    fontSize: "17px",
+    gap: "12px",
+    marginBottom: "14px",
+    fontSize: isMobile ? "15px" : "17px",
+    flexWrap: "wrap",
   },
 
   icon: {
@@ -164,12 +177,13 @@ const styles = {
   text: {
     lineHeight: "1.7",
     marginBottom: "18px",
+    fontSize: isMobile ? "14px" : "16px",
   },
 
   featureGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2,1fr)",
-    gap: "12px",
+    gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)",
+    gap: "10px",
     marginBottom: "16px",
   },
 
@@ -185,9 +199,9 @@ const styles = {
   partnerText: {
     color: "#16808D",
     fontWeight: "500",
+    fontSize: isMobile ? "14px" : "16px",
   },
 
-  /* 🔥 NEW STYLE FOR YOUR NAME */
   devBox: {
     marginTop: "20px",
     paddingTop: "14px",
@@ -204,6 +218,7 @@ const styles = {
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "600",
+    width: isMobile ? "100%" : "auto",
   },
 };
 
