@@ -5,12 +5,15 @@ services:
     plan: free
 
     buildCommand: |
+      cd cropguard_ai
       pip install -r requirements.txt
-      cd cropguard_ai/frontend
+      cd frontend
       npm install
       npm run build
 
-    startCommand: uvicorn api.index:app --host 0.0.0.0 --port 10000
+    startCommand: |
+      cd cropguard_ai
+      uvicorn api.index:app --host 0.0.0.0 --port 10000
 
     envVars:
       - key: PYTHON_VERSION
