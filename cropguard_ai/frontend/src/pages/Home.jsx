@@ -7,9 +7,6 @@ function Home() {
   const farmerProfile = JSON.parse(localStorage.getItem("activeFarmer"));
   const [showProfile, setShowProfile] = useState(false);
 
-  // ⭐ NEW — mobile menu state (PRO FIX)
-  const [mobileMenu, setMobileMenu] = useState(false);
-
   const language = localStorage.getItem("appLanguage") || "en";
 
   const t = (key) => {
@@ -67,9 +64,8 @@ function Home() {
           <h2 style={styles.logoText}>CropGuard AI</h2>
         </div>
 
-        {/* ⭐ PRO NAVBAR */}
         <nav style={styles.navWrapper}>
-          {/* Desktop Menu */}
+          {/* DESKTOP MENU */}
           {!isMobile && (
             <ul style={styles.navList}>
               <li style={styles.navItem} onClick={() => navigate("/history")}>
@@ -87,59 +83,37 @@ function Home() {
             </ul>
           )}
 
-          {/* ⭐ MOBILE HAMBURGER */}
-          {isMobile && (
-            <button
-              style={styles.menuBtn}
-              onClick={() => setMobileMenu(!mobileMenu)}
-            >
-              ☰
-            </button>
-          )}
-
-          {/* ⭐ MOBILE DROPDOWN */}
-          {mobileMenu && isMobile && (
-            <div style={styles.mobileMenu}>
-              <p onClick={() => navigate("/history")}>{t("history")}</p>
-              <p onClick={() => navigate("/calendar")}>{t("calendar")}</p>
-              <p onClick={() => navigate("/dashboard")}>{t("dashboard")}</p>
-              <p onClick={() => navigate("/contact")}>{t("contact")}</p>
-            </div>
-          )}
-
-          {/* PROFILE BUTTON (UNCHANGED) */}
+          {/* ⭐ PRO MOBILE PROFILE MENU */}
           {farmerProfile && (
             <div style={{ position: "relative", marginLeft: "14px" }}>
               <button
                 onClick={() => setShowProfile(!showProfile)}
-                style={{
-                  backgroundColor: "#1B9AAA",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "20px",
-                  padding: "6px 14px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                }}
+                style={styles.profileBtn}
               >
-                {farmerProfile.fullName}
+                {farmerProfile.fullName} ▾
               </button>
 
               {showProfile && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "44px",
-                    backgroundColor: "#ffffff",
-                    padding: "16px",
-                    borderRadius: "14px",
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-                    width: "220px",
-                    zIndex: 100,
-                    color: "#142C52",
-                  }}
-                >
+                <div style={styles.profileMenu}>
+                  {/* ⭐ MOBILE NAV INSIDE PROFILE */}
+                  {isMobile && (
+                    <>
+                      <p style={styles.menuItem} onClick={() => navigate("/history")}>
+                        {t("history")}
+                      </p>
+                      <p style={styles.menuItem} onClick={() => navigate("/calendar")}>
+                        {t("calendar")}
+                      </p>
+                      <p style={styles.menuItem} onClick={() => navigate("/dashboard")}>
+                        {t("dashboard")}
+                      </p>
+                      <p style={styles.menuItem} onClick={() => navigate("/contact")}>
+                        {t("contact")}
+                      </p>
+                      <hr style={{ margin: "10px 0" }} />
+                    </>
+                  )}
+
                   <p style={{ fontWeight: "600", marginBottom: "4px" }}>
                     {farmerProfile.fullName}
                   </p>
@@ -147,23 +121,12 @@ function Home() {
                     {farmerProfile.cropType} • {farmerProfile.location}
                   </p>
 
-                  <hr style={{ margin: "10px 0" }} />
-
                   <button
                     onClick={() => {
                       localStorage.removeItem("activeFarmer");
                       window.location.href = "/";
                     }}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      backgroundColor: "#DC2626",
-                      color: "#ffffff",
-                      border: "none",
-                      borderRadius: "10px",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
+                    style={styles.logoutBtn}
                   >
                     {t("logout")}
                   </button>
@@ -209,24 +172,44 @@ const styles = {
   navList:{display:"flex",listStyle:"none",gap:"22px",margin:0,padding:0},
   navItem:{cursor:"pointer",fontWeight:"500"},
 
-  menuBtn:{
-    background:"none",
-    border:"none",
-    fontSize:"26px",
+  profileBtn:{
+    backgroundColor:"#1B9AAA",
     color:"#fff",
-    cursor:"pointer"
+    border:"none",
+    borderRadius:"20px",
+    padding:"6px 14px",
+    cursor:"pointer",
+    fontWeight:"600"
   },
 
-  mobileMenu:{
+  profileMenu:{
     position:"absolute",
     right:0,
-    top:"50px",
+    top:"44px",
     background:"#fff",
-    borderRadius:"12px",
+    borderRadius:"14px",
     boxShadow:"0 10px 25px rgba(0,0,0,0.15)",
-    padding:"14px",
-    color:"#142C52",
-    zIndex:200
+    padding:"16px",
+    width:"220px",
+    zIndex:200,
+    color:"#142C52"
+  },
+
+  menuItem:{
+    padding:"8px 0",
+    cursor:"pointer",
+    fontWeight:"500"
+  },
+
+  logoutBtn:{
+    width:"100%",
+    padding:"10px",
+    backgroundColor:"#DC2626",
+    color:"#ffffff",
+    border:"none",
+    borderRadius:"10px",
+    cursor:"pointer",
+    fontWeight:"600"
   },
 
   main:{flex:1,display:"flex",justifyContent:"center",alignItems:"center",padding:"60px 20px"},
