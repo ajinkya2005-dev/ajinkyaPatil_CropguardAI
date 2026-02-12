@@ -1,32 +1,14 @@
 services:
-  # ==============================
-  # 🔵 FASTAPI BACKEND SERVICE
-  # ==============================
   - type: web
-    name: cropguard-api
-    env: python
-    plan: free
-    rootDir: cropguard_ai
+    name: cropguard-ai-api
+    runtime: python
+    plan: free   # ✅ this is the correct way to set free plan
     buildCommand: |
+      cd cropguard_ai
       pip install -r requirements.txt
     startCommand: |
+      cd cropguard_ai
       uvicorn api.index:app --host 0.0.0.0 --port 10000
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-
-  # ==============================
-  # 🟢 REACT FRONTEND STATIC SITE
-  # ==============================
-  - type: web
-    name: cropguard-frontend
-    env: static
-    plan: free
-    rootDir: cropguard_ai/frontend
-    buildCommand: |
-      npm install
-      npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://cropguard-api.onrender.com
