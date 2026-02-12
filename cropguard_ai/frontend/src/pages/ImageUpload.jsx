@@ -59,9 +59,7 @@ function ImageUpload() {
     return translations[language]?.[key] || key;
   };
 
-  /* ================================
-     CAMERA
-  =================================*/
+  /* CAMERA */
   const startCamera = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -92,9 +90,7 @@ function ImageUpload() {
     }, "image/jpeg");
   };
 
-  /* ================================
-     MULTI IMAGE UPLOAD
-  =================================*/
+  /* MULTI IMAGE UPLOAD */
   const handleUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -104,7 +100,7 @@ function ImageUpload() {
     }
   };
 
-  
+  /* ✅ FIXED API CALL */
   const sendToBackend = async (file) => {
     try {
       setLoading(true);
@@ -112,13 +108,13 @@ function ImageUpload() {
       const formData = new FormData();
       formData.append("image", file);
 
-      fetch("https://cropguard-ai-api-mirp.onrender.com/api/pest-recommendations", {
-
-
-
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://cropguard-ai-api-mirp.onrender.com/api/analyze",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await res.json();
       const preview = URL.createObjectURL(file);
@@ -159,7 +155,6 @@ function ImageUpload() {
         <div style={styles.card}>
           <h2 style={styles.heading}>{t("title")}</h2>
 
-          {/* ⭐ STEP GUIDE CARD */}
           <div style={styles.guide}>
             <strong>{t("steps")}</strong>
             <p>{t("step1")}</p>
@@ -207,82 +202,24 @@ function ImageUpload() {
   );
 }
 
-/* ================================
-   ⭐ PREMIUM MOBILE STYLES
-=================================*/
+/* STYLES (unchanged) */
 const styles = {
   page:{minHeight:"100vh",backgroundColor:"#f4f6f8"},
   header:{backgroundColor:"#142C52",padding:"14px 20px"},
   brand:{display:"flex",alignItems:"center",gap:"12px"},
   logo:{height:"36px",backgroundColor:"#fff",padding:"6px",borderRadius:"8px"},
   brandText:{color:"#1B9AAA",margin:0},
-
   center:{display:"flex",justifyContent:"center",padding:"40px 16px"},
-  card:{
-    backgroundColor:"#fff",
-    padding:"28px",
-    borderRadius:"18px",
-    width:"100%",
-    maxWidth:"420px",
-    textAlign:"center",
-    boxShadow:"0 20px 40px rgba(0,0,0,0.12)",
-  },
-
+  card:{backgroundColor:"#fff",padding:"28px",borderRadius:"18px",width:"100%",maxWidth:"420px",textAlign:"center",boxShadow:"0 20px 40px rgba(0,0,0,0.12)"},
   heading:{marginBottom:"18px",color:"#142C52"},
-
-  guide:{
-    backgroundColor:"#E6F6F8",
-    padding:"14px",
-    borderRadius:"12px",
-    marginBottom:"18px",
-    textAlign:"left",
-    color:"#16808D",
-    fontSize:"14px",
-  },
-
-  uploadBox:{
-    display:"block",
-    padding:"16px",
-    borderRadius:"14px",
-    border:"2px dashed #1B9AAA",
-    color:"#16808D",
-    cursor:"pointer",
-    marginBottom:"14px",
-  },
-
+  guide:{backgroundColor:"#E6F6F8",padding:"14px",borderRadius:"12px",marginBottom:"18px",textAlign:"left",color:"#16808D",fontSize:"14px"},
+  uploadBox:{display:"block",padding:"16px",borderRadius:"14px",border:"2px dashed #1B9AAA",color:"#16808D",cursor:"pointer",marginBottom:"14px"},
   multi:{fontSize:"12px",marginTop:"6px"},
-
-  cameraBtn:{
-    padding:"12px",
-    backgroundColor:"#142C52",
-    color:"#fff",
-    border:"none",
-    borderRadius:"12px",
-    width:"100%",
-    fontWeight:"600"
-  },
-
+  cameraBtn:{padding:"12px",backgroundColor:"#142C52",color:"#fff",border:"none",borderRadius:"12px",width:"100%",fontWeight:"600"},
   video:{width:"100%",borderRadius:"12px",marginBottom:"12px"},
-
-  captureBtn:{
-    padding:"12px",
-    backgroundColor:"#1B9AAA",
-    color:"#fff",
-    border:"none",
-    borderRadius:"12px",
-    width:"100%",
-    fontWeight:"600"
-  },
-
+  captureBtn:{padding:"12px",backgroundColor:"#1B9AAA",color:"#fff",border:"none",borderRadius:"12px",width:"100%",fontWeight:"600"},
   info:{marginTop:"16px",color:"#16808D",fontWeight:"600"},
-  success:{
-    marginTop:"16px",
-    backgroundColor:"#E6F6F8",
-    color:"#16808D",
-    padding:"12px",
-    borderRadius:"10px",
-    fontWeight:"600",
-  },
+  success:{marginTop:"16px",backgroundColor:"#E6F6F8",color:"#16808D",padding:"12px",borderRadius:"10px",fontWeight:"600"},
 };
 
 export default ImageUpload;
