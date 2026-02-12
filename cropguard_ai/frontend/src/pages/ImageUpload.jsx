@@ -112,7 +112,8 @@ function ImageUpload() {
       const formData = new FormData();
       formData.append("image", file);
 
-      fetch("https://cropguard-ai-mirp.onrender.com/api/analyze", {
+      fetch("https://cropguard-ai-api-mirp.onrender.com/api/pest-recommendations", {
+
 
 
         method: "POST",
