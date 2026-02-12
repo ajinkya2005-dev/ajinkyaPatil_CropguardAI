@@ -37,9 +37,9 @@ function ImageUpload() {
         analyzing: "छवि का विश्लेषण हो रहा है…",
         success: "छवि सफलतापूर्वक प्रोसेस हुई।",
         steps: "सही फसल छवि कैसे अपलोड करें",
-        step1: "📸 साफ पत्ती की फोटो लें",
-        step2: "🌞 प्राकृतिक रोशनी उपयोग करें",
-        step3: "🔍 धुंधली फोटो से बचें",
+        step1: "साफ पत्ती की फोटो लें",
+        step2: " प्राकृतिक रोशनी उपयोग करें",
+        step3: " धुंधली फोटो से बचें",
         multi: "एक से अधिक छवियां चुन सकते हैं",
       },
       mr: {
@@ -50,16 +50,16 @@ function ImageUpload() {
         analyzing: "प्रतिमा विश्लेषण सुरू आहे…",
         success: "प्रतिमा प्रोसेस झाली.",
         steps: "योग्य पीक फोटो कसा अपलोड करावा",
-        step1: "📸 स्पष्ट पानाचा फोटो घ्या",
-        step2: "🌞 नैसर्गिक प्रकाश वापरा",
-        step3: "🔍 ब्लर फोटो टाळा",
+        step1: " स्पष्ट पानाचा फोटो घ्या",
+        step2: " नैसर्गिक प्रकाश वापरा",
+        step3: " ब्लर फोटो टाळा",
         multi: "अनेक फोटो निवडू शकता",
       },
     };
     return translations[language]?.[key] || key;
   };
 
-  /* CAMERA */
+  
   const startCamera = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -90,7 +90,7 @@ function ImageUpload() {
     }, "image/jpeg");
   };
 
-  /* MULTI IMAGE UPLOAD */
+  
   const handleUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -100,7 +100,7 @@ function ImageUpload() {
     }
   };
 
-  /* ✅ FIXED API CALL */
+  
   const sendToBackend = async (file) => {
     try {
       setLoading(true);
@@ -202,7 +202,7 @@ function ImageUpload() {
   );
 }
 
-/* STYLES (unchanged) */
+
 const styles = {
   page:{minHeight:"100vh",backgroundColor:"#f4f6f8"},
   header:{backgroundColor:"#142C52",padding:"14px 20px"},
