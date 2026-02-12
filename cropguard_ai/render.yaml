@@ -5,6 +5,7 @@ services:
   - type: web
     name: cropguard-api
     env: python
+    plan: free
     rootDir: cropguard_ai
     buildCommand: |
       pip install -r requirements.txt
@@ -20,6 +21,7 @@ services:
   - type: web
     name: cropguard-frontend
     env: static
+    plan: free
     rootDir: cropguard_ai/frontend
     buildCommand: |
       npm install
