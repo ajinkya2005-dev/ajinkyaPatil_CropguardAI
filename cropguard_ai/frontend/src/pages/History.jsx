@@ -14,7 +14,7 @@ const styles = {
 
   brandText: { color: "#1B9AAA", margin: 0 },
 
-  /* ⭐ PRO RESPONSIVE CONTAINER */
+  
   container: {
     padding: "40px 18px",
     maxWidth: "1000px",
@@ -29,7 +29,7 @@ const styles = {
 
   empty: { color: "#16808D" },
 
-  /* ⭐ PREMIUM CARD */
+  
   card: {
     backgroundColor: "#ffffff",
     borderRadius: "18px",
@@ -96,7 +96,7 @@ const styles = {
     fontWeight: "500",
   },
 
-  /* ⭐ PRO TREATMENT BOX */
+  
   treatmentBox: {
     marginTop: "16px",
     backgroundColor: "#F9FAFB",
@@ -104,7 +104,7 @@ const styles = {
     borderRadius: "12px",
   },
 
-  /* ⭐ FIXED BUTTON SPACING */
+  
   outcomeBtns: {
     display: "flex",
     gap: "10px",
@@ -112,7 +112,7 @@ const styles = {
     flexWrap: "wrap",
   },
 
-  /* ⭐ PRO BUTTON PILLS */
+  
   goodBtn: {
     backgroundColor: "#16A34A",
     color: "#fff",
@@ -146,7 +146,7 @@ const styles = {
     cursor: "pointer",
   },
 
-  /* ⭐ EXPORT BUTTON UPGRADE */
+  
   exportBtn: {
     marginTop: "18px",
     padding: "12px 20px",
