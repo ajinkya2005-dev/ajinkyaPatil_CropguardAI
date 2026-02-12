@@ -1,11 +1,17 @@
 services:
   - type: web
     name: cropguard-ai
-    env: python
+    runtime: python
     plan: free
 
     buildCommand: |
       pip install -r requirements.txt
-      cd frontend && npm install && npm run build
+      cd cropguard_ai/frontend
+      npm install
+      npm run build
 
     startCommand: uvicorn api.index:app --host 0.0.0.0 --port 10000
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
