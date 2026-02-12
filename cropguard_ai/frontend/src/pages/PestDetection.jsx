@@ -17,7 +17,7 @@ function PestDetection() {
         heading: "Pest Detection & Control",
         analyzing: "Analyzing pest threats...",
         none: "No pest threats detected for current crop condition.",
-        stableTitle: "🌿 Crop Health Looks Stable",
+        stableTitle: "Crop Health Looks Stable",
         stableText:
           "No immediate pest threats detected. Strengthen crop immunity using these AI suggestions.",
         risk: "Risk",
@@ -31,7 +31,7 @@ function PestDetection() {
         heading: "कीट पहचान और नियंत्रण",
         analyzing: "कीट खतरे का विश्लेषण...",
         none: "वर्तमान फसल स्थिति के लिए कोई कीट खतरा नहीं मिला।",
-        stableTitle: "🌿 फसल की स्थिति स्थिर है",
+        stableTitle: " फसल की स्थिति स्थिर है",
         stableText: "AI सुझावों से फसल की ताकत बढ़ाएँ।",
         risk: "जोखिम",
         reason: "कारण",
@@ -44,7 +44,7 @@ function PestDetection() {
         heading: "किड ओळख व नियंत्रण",
         analyzing: "किड धोका विश्लेषण चालू...",
         none: "सध्याच्या पिकासाठी किड धोका नाही.",
-        stableTitle: "🌿 पीक स्थिती स्थिर आहे",
+        stableTitle: " पीक स्थिती स्थिर आहे",
         stableText: "AI सुचनांमुळे पीक अधिक मजबूत करा.",
         risk: "जोखीम",
         reason: "कारण",
@@ -57,18 +57,15 @@ function PestDetection() {
     return translations[language]?.[key] || key;
   };
 
-  /* ===============================
-     AMAZON LINK BUILDER (UNCHANGED)
-  ===============================*/
+ 
+  
   const buildAmazonLink = (text) => {
     if (!text) return "#";
     const query = text.replace(/\s+/g, "+");
     return `https://www.amazon.in/s?k=${query}+for+plants`;
   };
 
-  /* ===============================
-     EXISTING SMART PRODUCTS ENGINE
-  ===============================*/
+ 
   const getRelatedProducts = (control) => {
     if (!control) return [];
 
@@ -106,9 +103,7 @@ function PestDetection() {
     ];
   };
 
-  /* ===============================
-     🔥 ELITE ADDITION — FALLBACK PRODUCTS
-  ===============================*/
+ 
   const getFallbackProducts = () => {
     return [
       "Organic Bio Fertilizer Liquid",
@@ -155,9 +150,7 @@ function PestDetection() {
 
         {loading && <p style={styles.info}>{t("analyzing")}</p>}
 
-        {/* ===============================
-           🔥 ELITE EMPTY STATE CARD
-        ===============================*/}
+        
         {!loading && pests.length === 0 && (
           <div style={styles.emptyCard}>
             <h3>{t("stableTitle")}</h3>
@@ -175,7 +168,7 @@ function PestDetection() {
                     rel="noopener noreferrer"
                     style={styles.productChip}
                   >
-                    🌱 {prod}
+                     {prod}
                   </a>
                 ))}
               </div>
@@ -183,7 +176,7 @@ function PestDetection() {
           </div>
         )}
 
-        {/* EXISTING PEST CARDS */}
+        
         {pests.map((pest, index) => (
           <div key={index} style={styles.card}>
             <div style={styles.row}>
@@ -243,9 +236,7 @@ function PestDetection() {
   );
 }
 
-/* ===============================
-   🎨 ELITE UI V2 STYLES
-===============================*/
+
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#f4f6f8" },
   header: { backgroundColor: "#142C52", padding: "14px 32px" },
@@ -262,7 +253,7 @@ const styles = {
   heading: { color: "#142C52", marginBottom: "30px" },
   info: { color: "#16808D", fontSize: "16px" },
 
-  /* EXISTING CARD */
+  
   card: {
     backgroundColor: "#ffffff",
     padding: "24px",
@@ -272,7 +263,7 @@ const styles = {
     color: "#142C52",
   },
 
-  /* 🔥 NEW EMPTY CARD */
+  
   emptyCard: {
     backgroundColor: "#ffffff",
     padding: "26px",
