@@ -68,9 +68,7 @@ function CropCalendar() {
     }
   }, []);
 
-  /* ================================
-     WEATHER RISK API (FIXED)
-  =================================*/
+ 
   const fetchWeatherRisk = async (location) => {
     try {
       setLoadingWeather(true);
