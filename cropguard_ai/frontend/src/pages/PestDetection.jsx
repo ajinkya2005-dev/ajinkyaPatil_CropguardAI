@@ -123,7 +123,8 @@ function PestDetection() {
   useEffect(() => {
     if (!stored) return;
 
-    fetch("https://cropguard-ai-mirp.onrender.com/api/pest-recommendations", {
+    fetch("https://cropguard-ai-api-mirp.onrender.com/api/pest-recommendations", {
+
 
 
       method: "POST",
